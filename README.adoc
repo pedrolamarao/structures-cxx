@@ -1,0 +1,8 @@
+= structures-cxx
+:author: Pedro Lamarão <pedro.lamarao@gmail.com>
+
+`structures-cxx` is an experimental data structures library written in C++ 20 with modules for the Clang 18 compiler.
+
+The objective of this experiment is to explore classic data structures (list, hoop, queue, stack, heap etc.) implemented alternatively onto contiguous and sparse memory, _i.e._ with memory *segments* and memory *nodes*.
+
+Our hope is to achieve reusable, efficient search structures onto compact, contiguous memory.
