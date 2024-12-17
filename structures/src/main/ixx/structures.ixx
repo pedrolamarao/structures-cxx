@@ -15,8 +15,8 @@ namespace br::dev::pedrolamarao::structures
     template <typename T>
     struct segment
     {
-        T      * address {};
-        size_t   length  {};
+        T*     base   {};
+        size_t length {};
     };
 
     // Definition below.
@@ -125,7 +125,7 @@ namespace br::dev::pedrolamarao::structures
 
         ~segment_list ()
         {
-            delete [] root_.address;
+            delete [] root_.base;
         }
 
         // factories
@@ -152,11 +152,25 @@ namespace br::dev::pedrolamarao::structures
             return count_ == 0;
         }
 
-        // traversal
+        // query
 
         auto cursor ()
         {
-            return segment_list_cursor(root_.address,root_.address+count_);
+            return segment_list_cursor(root_.base,root_.base+count_);
+        }
+
+        // requires: index <= count
+        auto load (size_t index) const
+        {
+            return root_.base[index];
+        }
+
+        // update
+
+        // requires: index <= count
+        auto store (size_t index, T value)
+        {
+            return root_.base[index] = value;
         }
     };
 
@@ -281,11 +295,35 @@ namespace br::dev::pedrolamarao::structures
             return root_ == nullptr;
         }
 
-        // traversal
+        // query
 
         auto cursor ()
         {
             return uninode_list_cursor<T>(root_);
+        }
+
+        // requires: index <= count
+        auto load (size_t index) const
+        {
+            auto node = root_;
+            while (index > 0) {
+                node = node->link;
+                --index;
+            }
+            return node->content;
+        }
+
+        // update
+
+        // requires: index <= count
+        void store (size_t index, T value)
+        {
+            auto node = root_;
+            while (index > 0) {
+                node = node->link;
+                --index;
+            }
+            node->content = std::move(value);
         }
     };
 
