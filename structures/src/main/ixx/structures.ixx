@@ -22,7 +22,7 @@ namespace br::dev::pedrolamarao::structures
     template <typename T>
     class segment_list;
 
-    /// List cursor on a segment.
+    /// Cursor on segment lists.
     export
     template <typename T>
     class segment_list_cursor
@@ -51,7 +51,7 @@ namespace br::dev::pedrolamarao::structures
         }
     };
 
-    /// List position on a segment.
+    /// Position on segment lists.
     export
     template <typename T>
     class segment_list_position
@@ -59,19 +59,18 @@ namespace br::dev::pedrolamarao::structures
         template <typename>
         friend class segment_list;
 
-        T const * current;
-        T const * limit;
+        T * current;
 
-        explicit segment_list_position (T * p, T * l) :
-            current{p}, limit{l}
+        explicit segment_list_position (T * c) :
+            current{c}
         { }
 
     public:
 
-        // requires: good()
+        // requires: ?
         auto next ()
         {
-            return segment_list_iterator<T>(current+1,limit);
+            return segment_list_position(current+1);
         }
     };
 
@@ -137,18 +136,21 @@ namespace br::dev::pedrolamarao::structures
             return segment_list<TT>(segment_,count);
         }
 
-        // properties
-
-        auto is_empty () const
-        {
-            return count_ == 0;
-        }
-
         // query
 
         auto cursor ()
         {
             return segment_list_cursor(root_.base,root_.base+count_);
+        }
+
+        auto first ()
+        {
+            return segment_list_position<T>(root_.base);
+        }
+
+        auto is_empty () const
+        {
+            return count_ == 0;
         }
 
         // requires: index <= count
@@ -157,12 +159,41 @@ namespace br::dev::pedrolamarao::structures
             return root_.base[index];
         }
 
+        // requires: cursor.good()
+        auto load (segment_list_cursor<T>& cursor) const
+        {
+            return *(cursor.current);
+        }
+
+        // requires: position in [first,limit)
+        auto load (segment_list_position<T> position) const
+        {
+            return *(position.current);
+        }
+
+        auto limit ()
+        {
+            return segment_list_position<T>(root_.base+count_);
+        }
+
         // update
 
         // requires: index <= count
         auto store (size_t index, T value)
         {
             return root_.base[index] = value;
+        }
+
+        // requires: cursor.good()
+        void store (segment_list_cursor<T>& cursor, T value)
+        {
+            *(cursor.current) = value;
+        }
+
+        // requires: ?
+        void store (segment_list_position<T> position, T value)
+        {
+            *(position.current) = value;
         }
     };
 
@@ -180,7 +211,7 @@ namespace br::dev::pedrolamarao::structures
     template <typename T>
     class uninode_list;
 
-    /// List cursor on uni-link nodes.
+    /// Cursor on uni-link node lists.
     export
     template <typename T>
     class uninode_list_cursor
@@ -188,21 +219,42 @@ namespace br::dev::pedrolamarao::structures
         template <typename>
         friend class uninode_list;
 
-        uninode<T> * current;
+        uninode<T> * node;
 
-        explicit uninode_list_cursor (uninode<T> * p) : current{p} {}
+        explicit uninode_list_cursor (uninode<T> * p) : node{p} {}
 
     public:
 
         auto good () const
         {
-            return current != nullptr;
+            return node != nullptr;
         }
 
         // requires: good()
         void advance ()
         {
-            current = current->link;
+            node = node->link;
+        }
+    };
+
+    /// Position on uni-link node lists.
+    export
+    template <typename T>
+    class uninode_list_position
+    {
+        template <typename>
+        friend class uninode_list;
+
+        uninode<T> * node;
+
+        explicit uninode_list_position (uninode<T> * p) : node{p} {}
+
+    public:
+
+        // requires: current != nullptr
+        auto next ()
+        {
+            return uninode_list_position(node->link);
         }
     };
 
@@ -274,18 +326,21 @@ namespace br::dev::pedrolamarao::structures
             return uninode_list<TT>(root);
         }
 
-        // properties
-
-        auto is_empty () const
-        {
-            return root_ == nullptr;
-        }
-
         // query
 
         auto cursor ()
         {
             return uninode_list_cursor<T>(root_);
+        }
+
+        auto first ()
+        {
+            return uninode_list_position<T>(root_);
+        }
+
+        auto is_empty () const
+        {
+            return root_ == nullptr;
         }
 
         // requires: index <= count
@@ -299,6 +354,23 @@ namespace br::dev::pedrolamarao::structures
             return node->content;
         }
 
+        // requires: cursor.good()
+        auto load (uninode_list_cursor<T>& cursor) const
+        {
+            return cursor.node->content;
+        }
+
+        // requires: position in [first,limit)
+        auto load (uninode_list_position<T> position) const
+        {
+            return position.node->content;
+        }
+
+        auto limit ()
+        {
+            return uninode_list_position<T>(nullptr);
+        }
+
         // update
 
         // requires: index <= count
@@ -309,7 +381,19 @@ namespace br::dev::pedrolamarao::structures
                 node = node->link;
                 --index;
             }
-            node->content = std::move(value);
+            node->content = value;
+        }
+
+        // requires: cursor.good()
+        void store (uninode_list_cursor<T>& cursor, T value)
+        {
+            cursor.node->content = value;
+        }
+
+        // requires: ?
+        void store (uninode_list_position<T> position, T value)
+        {
+            position.node->content = value;
         }
     };
 
