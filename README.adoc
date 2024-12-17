@@ -6,3 +6,5 @@
 The objective of this experiment is to explore classic data structures (list, hoop, queue, stack, heap etc.) implemented alternatively onto contiguous and sparse memory, _i.e._ with memory *segments* and memory *nodes*.
 
 Our hope is to achieve reusable, efficient search structures onto compact, contiguous memory.
+
+We purposefully avoid certain terms, such as _array_ and _iterator_, with the purpose of avoiding the corresponding assumptions.

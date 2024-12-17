@@ -9,9 +9,7 @@ using namespace std;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /**
-     * Memory segment.
-     */
+    /// Memory segment.
     template <typename T>
     struct segment
     {
@@ -24,9 +22,7 @@ namespace br::dev::pedrolamarao::structures
     template <typename T>
     class segment_list;
 
-    /**
-     * Cursor traversing a list on a segment.
-     */
+    /// List cursor on a segment.
     export
     template <typename T>
     class segment_list_cursor
@@ -34,42 +30,40 @@ namespace br::dev::pedrolamarao::structures
         template <typename>
         friend class segment_list;
 
-        T       * position;
+        T       * current;
         T const * limit;
 
         explicit segment_list_cursor (T * p, T * l) :
-            position{p}, limit{l}
+            current{p}, limit{l}
         { }
 
     public:
 
         auto good () const
         {
-            return position < limit;
+            return current < limit;
         }
 
         // requires: good()
         void advance ()
         {
-            ++position;
+            ++current;
         }
     };
 
-    /**
-     * Iterator traversing a list on a segment.
-     */
+    /// List position on a segment.
     export
     template <typename T>
-    class segment_list_iterator
+    class segment_list_position
     {
         template <typename>
         friend class segment_list;
 
-        T const * position;
+        T const * current;
         T const * limit;
 
-        explicit segment_list_iterator (T * p, T * l) :
-            position{p}, limit{l}
+        explicit segment_list_position (T * p, T * l) :
+            current{p}, limit{l}
         { }
 
     public:
@@ -77,14 +71,12 @@ namespace br::dev::pedrolamarao::structures
         // requires: good()
         auto next ()
         {
-            return segment_list_iterator<T>(position+1,limit);
+            return segment_list_iterator<T>(current+1,limit);
         }
     };
 
-    /**
-     * List on a segment.
-     */
-    // Previously exported.
+    /// List on a segment.
+    // Exported above.
     template <typename T>
     class segment_list
     {
@@ -174,9 +166,7 @@ namespace br::dev::pedrolamarao::structures
         }
     };
 
-    /**
-     * Memory node with one link.
-     */
+    /// Memory node with one link.
     export
     template <typename T>
     struct uninode
@@ -190,9 +180,7 @@ namespace br::dev::pedrolamarao::structures
     template <typename T>
     class uninode_list;
 
-    /**
-     * Cursor traversing a list on uninodes.
-     */
+    /// List cursor on uni-link nodes.
     export
     template <typename T>
     class uninode_list_cursor
@@ -200,28 +188,26 @@ namespace br::dev::pedrolamarao::structures
         template <typename>
         friend class uninode_list;
 
-        uninode<T> * position;
+        uninode<T> * current;
 
-        explicit uninode_list_cursor (uninode<T> * p) : position{p} {}
+        explicit uninode_list_cursor (uninode<T> * p) : current{p} {}
 
     public:
 
         auto good () const
         {
-            return position != nullptr;
+            return current != nullptr;
         }
 
         // requires: good()
         void advance ()
         {
-            position = position->link;
+            current = current->link;
         }
     };
 
-    /**
-     * List on uninodes.
-     */
-    // Previously exported.
+    /// List on uni-link nodes.
+    // Exported above.
     template <typename T>
     class uninode_list
     {
@@ -327,9 +313,7 @@ namespace br::dev::pedrolamarao::structures
         }
     };
 
-    /**
-     * Forward traversing cursor.
-     */
+    /// Forward traversing cursor.
     export
     template <typename Cursor>
     concept forward_cursor = requires (Cursor cursor)
@@ -338,19 +322,15 @@ namespace br::dev::pedrolamarao::structures
         { cursor.advance() };
     };
 
-    /**
-     * Forward traversing iterator.
-     */
+    /// Forward traversing position.
     export
-    template <typename Iterator>
-    concept forward_iterator = requires (Iterator iterator)
+    template <typename Position>
+    concept forward_position = requires (Position position)
     {
-        { iterator.next() } -> convertible_to<Iterator>;
+        { position.next() } -> convertible_to<Position>;
     };
 
-    /**
-     * Count positions until end-of-cursor.
-     */
+    /// Count positions until end-of-cursor.
     export
     template <typename Cursor>
     requires forward_cursor<Cursor>
@@ -364,13 +344,11 @@ namespace br::dev::pedrolamarao::structures
         return count;
     }
 
-    /**
-     * Count positions in range [first,limit).
-     */
+    /// Count positions in range [first,limit).
     export
-    template <typename Iterator>
-    requires forward_iterator<Iterator>
-    auto count (Iterator first, Iterator limit) -> size_t
+    template <typename Position>
+    requires forward_position<Position>
+    auto count (Position first, Position limit) -> size_t
     {
         size_t count {};
         while (first != limit) {
