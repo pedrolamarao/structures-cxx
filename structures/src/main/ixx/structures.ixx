@@ -22,35 +22,6 @@ namespace br::dev::pedrolamarao::structures
     template <typename T>
     class segment_list;
 
-    /// Cursor on segment lists.
-    export
-    template <typename T>
-    class segment_list_cursor
-    {
-        template <typename>
-        friend class segment_list;
-
-        T       * current;
-        T const * limit;
-
-        explicit segment_list_cursor (T * p, T * l) :
-            current{p}, limit{l}
-        { }
-
-    public:
-
-        auto good () const
-        {
-            return current < limit;
-        }
-
-        // requires: good()
-        void advance ()
-        {
-            ++current;
-        }
-    };
-
     /// Position on segment lists.
     export
     template <typename T>
@@ -138,11 +109,6 @@ namespace br::dev::pedrolamarao::structures
 
         // query
 
-        auto cursor ()
-        {
-            return segment_list_cursor(root_.base,root_.base+count_);
-        }
-
         auto first ()
         {
             return segment_list_position<T>(root_.base);
@@ -157,12 +123,6 @@ namespace br::dev::pedrolamarao::structures
         auto load (size_t index) const
         {
             return root_.base[index];
-        }
-
-        // requires: cursor.good()
-        auto load (segment_list_cursor<T>& cursor) const
-        {
-            return *(cursor.current);
         }
 
         // requires: position in [first,limit)
@@ -182,12 +142,6 @@ namespace br::dev::pedrolamarao::structures
         auto store (size_t index, T value)
         {
             return root_.base[index] = value;
-        }
-
-        // requires: cursor.good()
-        void store (segment_list_cursor<T>& cursor, T value)
-        {
-            *(cursor.current) = value;
         }
 
         // requires: ?
@@ -210,32 +164,6 @@ namespace br::dev::pedrolamarao::structures
     export
     template <typename T>
     class uninode_list;
-
-    /// Cursor on uni-link node lists.
-    export
-    template <typename T>
-    class uninode_list_cursor
-    {
-        template <typename>
-        friend class uninode_list;
-
-        uninode<T> * node;
-
-        explicit uninode_list_cursor (uninode<T> * p) : node{p} {}
-
-    public:
-
-        auto good () const
-        {
-            return node != nullptr;
-        }
-
-        // requires: good()
-        void advance ()
-        {
-            node = node->link;
-        }
-    };
 
     /// Position on uni-link node lists.
     export
@@ -328,11 +256,6 @@ namespace br::dev::pedrolamarao::structures
 
         // query
 
-        auto cursor ()
-        {
-            return uninode_list_cursor<T>(root_);
-        }
-
         auto first ()
         {
             return uninode_list_position<T>(root_);
@@ -354,12 +277,6 @@ namespace br::dev::pedrolamarao::structures
             return node->content;
         }
 
-        // requires: cursor.good()
-        auto load (uninode_list_cursor<T>& cursor) const
-        {
-            return cursor.node->content;
-        }
-
         // requires: position in [first,limit)
         auto load (uninode_list_position<T> position) const
         {
@@ -372,16 +289,6 @@ namespace br::dev::pedrolamarao::structures
         }
 
         // update
-
-        /// Inserts value after cursor position.
-        auto insert_after (uninode_list_cursor<T>& cursor, T value) requires copyable<T>
-        {
-            auto previous = cursor.node;
-            auto next = previous->link;
-            auto inserted = new uninode<T>(next,value);
-            previous->link = inserted;
-            return uninode_list_position<T>(inserted);
-        }
 
         /// Inserts value after position.
         auto insert_after (uninode_list_position<T> position, T value) requires copyable<T>
@@ -412,26 +319,11 @@ namespace br::dev::pedrolamarao::structures
             node->content = value;
         }
 
-        // requires: cursor.good()
-        void store (uninode_list_cursor<T>& cursor, T value)
-        {
-            cursor.node->content = value;
-        }
-
         // requires: ?
         void store (uninode_list_position<T> position, T value)
         {
             position.node->content = value;
         }
-    };
-
-    /// Forward traversing cursor.
-    export
-    template <typename Cursor>
-    concept forward_cursor = requires (Cursor cursor)
-    {
-        { cursor.good() } -> convertible_to<bool>;
-        { cursor.advance() };
     };
 
     /// Forward traversing position.
@@ -442,25 +334,11 @@ namespace br::dev::pedrolamarao::structures
         { position.next() } -> convertible_to<Position>;
     };
 
-    /// Count positions until end-of-cursor.
-    export
-    template <typename Cursor>
-    requires forward_cursor<Cursor>
-    auto count (Cursor cursor) -> size_t
-    {
-        size_t count {};
-        while (cursor.good()) {
-            ++count;
-            cursor.advance();
-        }
-        return count;
-    }
-
-    /// Count positions in range [first,limit).
+    /// Distance from first to limit.
     export
     template <typename Position>
     requires forward_position<Position>
-    auto count (Position first, Position limit) -> size_t
+    auto distance (Position first, Position limit) -> size_t
     {
         size_t count {};
         while (first != limit) {

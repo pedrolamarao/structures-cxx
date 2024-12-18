@@ -35,18 +35,6 @@ TEST(segment_list_test,filled_store_load)
     ASSERT_EQ( list.load(126), thing::one );
 }
 
-TEST(segment_list_test,filled_store_cursor_load)
-{
-    auto list = segment_list<thing>::filled(thing::one,127);
-    list.store(1,thing::forty_nine);
-    auto cursor = list.cursor();
-    ASSERT_EQ( list.load(cursor), thing::one );
-    cursor.advance();
-    ASSERT_EQ( list.load(cursor), thing::forty_nine );
-    for (auto i = 2; i <= 127; i++) cursor.advance();
-    ASSERT_EQ( list.load(126), thing::one );
-}
-
 TEST(segment_list_test,filled_store_position_load)
 {
     auto list = segment_list<thing>::filled(thing::one,127);
