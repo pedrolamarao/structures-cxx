@@ -69,3 +69,32 @@ TEST(segment_list_test,filled_store_position_load)
     for (auto i = 2; i <= 127; i++) position = position.next();
     ASSERT_EQ( list.load(126), thing::one );
 }
+
+TEST(segment_list_position_test,distance_0)
+{
+    auto list = segment_list<thing>();
+    auto count = structures::distance(list.first(),list.limit());
+    ASSERT_EQ( count, 0 );
+}
+
+TEST(segment_list_position_test,distance_127)
+{
+    auto list = segment_list<thing>::filled(thing::one,127);
+    auto count = structures::distance(list.first(),list.limit());
+    ASSERT_EQ( count, 127 );
+}
+
+TEST(segment_list_position_test,find)
+{
+    auto list = segment_list<thing>::filled(thing::one,127);
+    list.insert_at(64,thing::forty_nine);
+    auto position = structures::find(list.first(),list.limit(),thing::forty_nine);
+    ASSERT_NE( position, list.limit() );
+}
+
+TEST(segment_list_position_test,find_but_absent)
+{
+    auto list = segment_list<thing>::filled(thing::one,127);
+    auto position = structures::find(list.first(),list.limit(),thing::forty_nine);
+    ASSERT_EQ( position, list.limit() );
+}

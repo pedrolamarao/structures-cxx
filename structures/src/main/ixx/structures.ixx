@@ -1,6 +1,7 @@
 module;
 
 #include <algorithm>
+#include <chrono>
 #include <concepts>
 #include <cstdint>
 
@@ -39,12 +40,71 @@ namespace br::dev::pedrolamarao::structures
 
     public:
 
+        using value_type = T;
+
+        auto is_equal (segment_list_position that)
+        {
+            return current == that.current;
+        }
+
+        auto not_equal (segment_list_position that)
+        {
+            return current != that.current;
+        }
+
+        auto load ()
+        {
+            return *current;
+        }
+
         // requires: ?
         auto next ()
         {
             return segment_list_position(current+1);
         }
     };
+
+    export
+    template <typename T>
+    auto is_equal (segment_list_position<T> x, segment_list_position<T> y)
+    {
+        return x.is_equal(y);
+    }
+
+    export
+    template <typename T>
+    auto operator== (segment_list_position<T> x, segment_list_position<T> y)
+    {
+        return x.is_equal(y);
+    }
+
+    export
+    template <typename T>
+    auto not_equal (segment_list_position<T> x, segment_list_position<T> y)
+    {
+        return x.not_equal(y);
+    }
+
+    export
+    template <typename T>
+    auto operator!= (segment_list_position<T> x, segment_list_position<T> y)
+    {
+        return x.not_equal(y);
+    }
+
+    export
+    template <typename T>
+    auto load (segment_list_position<T> x)
+    {
+        return x.load();
+    }
+
+    export
+    template <typename T>
+    auto next (segment_list_position<T> x)
+    {
+        return x.next();
+    }
 
     /// List on a segment.
     // Exported above.
@@ -59,6 +119,8 @@ namespace br::dev::pedrolamarao::structures
         { }
 
     public:
+
+        using value_type = T;
 
         // type
 
@@ -220,12 +282,73 @@ namespace br::dev::pedrolamarao::structures
 
     public:
 
+        using value_type = T;
+
+        // regular
+
+        auto is_equal (uninode_list_position that)
+        {
+            return node == that.node;
+        }
+
+        auto not_equal (uninode_list_position that)
+        {
+            return node != that.node;
+        }
+
+        auto load ()
+        {
+            return node->content;
+        }
+
         // requires: current != nullptr
         auto next ()
         {
             return uninode_list_position(node->link);
         }
     };
+
+    export
+    template <typename T>
+    auto is_equal (uninode_list_position<T> x, uninode_list_position<T> y)
+    {
+        return x.is_equal(y);
+    }
+
+    export
+    template <typename T>
+    auto operator== (uninode_list_position<T> x, uninode_list_position<T> y)
+    {
+        return x.is_equal(y);
+    }
+
+    export
+    template <typename T>
+    auto not_equal (uninode_list_position<T> x, uninode_list_position<T> y)
+    {
+        return x.not_equal(y);
+    }
+
+    export
+    template <typename T>
+    auto operator!= (uninode_list_position<T> x, uninode_list_position<T> y)
+    {
+        return x.not_equal(y);
+    }
+
+    export
+    template <typename T>
+    auto load (uninode_list_position<T> x)
+    {
+        return x.load();
+    }
+
+    export
+    template <typename T>
+    auto next (uninode_list_position<T> x)
+    {
+        return x.next();
+    }
 
     /// List on uni-link nodes.
     // Exported above.
@@ -237,6 +360,8 @@ namespace br::dev::pedrolamarao::structures
         explicit uninode_list (uninode<T> * r) noexcept : root_{r} {}
 
     public:
+
+        using value_type = T;
 
         // type
 
@@ -367,25 +492,46 @@ namespace br::dev::pedrolamarao::structures
         }
     };
 
-    /// Forward traversing position.
+    /// Structural position.
     export
     template <typename Position>
-    concept forward_position = requires (Position position)
+    concept position = requires (Position position)
     {
-        { position.next() } -> convertible_to<Position>;
+        typename Position::value_type;
+        { is_equal(position,position) } -> convertible_to<bool>;
+        { not_equal(position,position) } -> convertible_to<bool>;
+        { load(position) } -> convertible_to<typename Position::value_type>;
+    };
+
+    /// Structural position with forward traversal.
+    export
+    template <typename Position>
+    concept forward_position = position<Position> && requires (Position position)
+    {
+        { next(position) } -> convertible_to<Position>;
     };
 
     /// Distance from first to limit.
     export
     template <typename Position>
     requires forward_position<Position>
-    auto distance (Position first, Position limit) -> size_t
+    auto distance (Position position, Position limit) -> size_t
     {
-        size_t count {};
-        while (first != limit) {
-            ++count;
-            first = first.next();
+        size_t counter {};
+        while (not_equal(position,limit)) {
+            ++counter;
+            position = next(position);
         }
-        return count;
+        return counter;
+    }
+
+    export
+    template <typename Position>
+    requires forward_position<Position> && equality_comparable<typename Position::value_type>
+    auto find (Position position, Position limit, typename Position::value_type value)
+    {
+        while (not_equal(position,limit) && load(position) != value)
+            position = next(position);
+        return position;
     }
 }
