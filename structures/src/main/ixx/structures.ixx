@@ -27,6 +27,20 @@ namespace br::dev::pedrolamarao::structures
         { load(position) } -> convertible_to<typename Position::value_type>;
     };
 
+    export
+    template <position P>
+    auto operator== (P x, P y)
+    {
+        return x.is_equal(y);
+    }
+
+    export
+    template <position P>
+    auto operator!= (P x, P y)
+    {
+        return x.not_equal(y);
+    }
+
     /// Structural position with forward traversal.
     export
     template <typename Position>

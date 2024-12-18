@@ -53,21 +53,7 @@ namespace br::dev::pedrolamarao::structures
 
     export
     template <typename T>
-    auto operator== (uninode_list_position<T> x, uninode_list_position<T> y)
-    {
-        return x.is_equal(y);
-    }
-
-    export
-    template <typename T>
     auto not_equal (uninode_list_position<T> x, uninode_list_position<T> y)
-    {
-        return x.not_equal(y);
-    }
-
-    export
-    template <typename T>
-    auto operator!= (uninode_list_position<T> x, uninode_list_position<T> y)
     {
         return x.not_equal(y);
     }

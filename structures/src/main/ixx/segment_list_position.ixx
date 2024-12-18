@@ -51,21 +51,7 @@ namespace br::dev::pedrolamarao::structures
 
     export
     template <typename T>
-    auto operator== (segment_list_position<T> x, segment_list_position<T> y)
-    {
-        return x.is_equal(y);
-    }
-
-    export
-    template <typename T>
     auto not_equal (segment_list_position<T> x, segment_list_position<T> y)
-    {
-        return x.not_equal(y);
-    }
-
-    export
-    template <typename T>
-    auto operator!= (segment_list_position<T> x, segment_list_position<T> y)
     {
         return x.not_equal(y);
     }
