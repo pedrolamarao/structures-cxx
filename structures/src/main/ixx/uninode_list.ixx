@@ -95,17 +95,6 @@ namespace br::dev::pedrolamarao::structures
             return root_ == nullptr;
         }
 
-        // requires: index <= count
-        auto load (size_t index) const
-        {
-            auto node = root_;
-            while (index > 0) {
-                node = node->link;
-                --index;
-            }
-            return node->content;
-        }
-
         // requires: position in [first,limit)
         auto load (uninode_list_position<T> position) const
         {
@@ -160,17 +149,6 @@ namespace br::dev::pedrolamarao::structures
             auto next = root_ != nullptr ? root_ : nullptr;
             root_ = new uninode<T>(next,value);
             return uninode_list_position<T>(root_);
-        }
-
-        // requires: index <= count
-        void store (size_t index, T value)
-        {
-            auto node = root_;
-            while (index > 0) {
-                node = node->link;
-                --index;
-            }
-            node->content = value;
         }
 
         // requires: ?
