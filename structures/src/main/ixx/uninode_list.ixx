@@ -24,6 +24,8 @@ namespace br::dev::pedrolamarao::structures
 
         using value_type = T;
 
+        using position_type = uninode_list_position<T>;
+
         // type
 
         uninode_list () noexcept :
@@ -117,7 +119,32 @@ namespace br::dev::pedrolamarao::structures
 
         // update
 
-        /// Inserts value after position.
+        /// Erases element after position.
+        auto erase_after (position_type position)
+        {
+            auto previous = position.node;
+            if (previous == nullptr)
+                return;
+            auto target = previous->link;
+            if (target == nullptr)
+                return;
+            previous->link = target->link;
+            delete target;
+        }
+
+        /// Erases element at first position.
+        auto erase_first ()
+        {
+            if (root_ == nullptr)
+                return;
+            auto target = root_;
+            root_ = root_->link;
+            delete target;
+        }
+
+        /// Inserts element after position.
+        ///
+        /// Requires: first < position
         auto insert_after (uninode_list_position<T> position, T value) requires copyable<T>
         {
             auto previous = position.node;
@@ -127,7 +154,7 @@ namespace br::dev::pedrolamarao::structures
             return uninode_list_position<T>(inserted);
         }
 
-        /// Inserts value at first position.
+        /// Inserts element at first position.
         auto insert_first (T value) requires copyable<T>
         {
             auto next = root_ != nullptr ? root_ : nullptr;

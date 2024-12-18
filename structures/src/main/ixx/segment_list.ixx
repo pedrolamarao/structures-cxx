@@ -30,6 +30,8 @@ namespace br::dev::pedrolamarao::structures
 
         using value_type = T;
 
+        using position_type = segment_list_position<T>;
+
         // type
 
         segment_list () noexcept :
@@ -109,19 +111,32 @@ namespace br::dev::pedrolamarao::structures
 
         // update
 
+        void erase_at (size_t index)
+        {
+            shift_left(index,count_);
+            --count_;
+        }
+
+        void erase_at (position_type position)
+        {
+            size_t index = position.current - root_.base;
+            erase_at(index);
+        }
+
         auto insert_at (size_t index, T value) requires copyable<T>
         {
             auto new_count = max(count_,index) + 1;
             expand(new_count);
-            shift(index);
+            shift_right(index);
             root_.base[index] = value;
             count_ = new_count;
             return segment_list_position<T>(root_.base+index);
         }
 
-        auto insert_first (T value)
+        void insert_at (position_type position, T value)
         {
-            return insert_at(0,value);
+            size_t index = position.current - root_.base;
+            insert_at(index,value);
         }
 
         // requires: index <= count
@@ -151,9 +166,16 @@ namespace br::dev::pedrolamarao::structures
             root_.length = capacity;
         }
 
+        // requires: position < limit
+        void shift_left (size_t position, size_t limit) requires copyable<T>
+        {
+            for (auto i = position, j = position+1; j != limit; ++i, ++j)
+                root_.base[i] = root_.base[j];
+        }
+
         // requires: count < capacity
         // requires: [0,capacity) is initialized
-        void shift (size_t index) requires copyable<T>
+        void shift_right (size_t index) requires copyable<T>
         {
             if (count_ <= index)
                 return;

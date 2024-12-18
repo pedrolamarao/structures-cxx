@@ -33,12 +33,18 @@ TEST(uninode_list_test,filled)
     ASSERT_EQ( list.load(126), thing::one );
 }
 
-TEST(uninode_list_test,filled_insert_first)
+TEST(uninode_list_test,filled_erase_after)
+{
+    auto list = uninode_list<thing>::filled(thing::one,2);
+    list.erase_after( list.first() );
+    ASSERT_EQ( list.load(0), thing::one );
+}
+
+TEST(uninode_list_test,filled_erase_first)
 {
     auto list = uninode_list<thing>::filled(thing::one,1);
-    list.insert_first(thing::forty_nine);
-    ASSERT_EQ( list.load(0), thing::forty_nine );
-    ASSERT_EQ( list.load(1), thing::one );
+    list.erase_first();
+    ASSERT_EQ( list.first(), list.limit() );
 }
 
 TEST(uninode_list_test,filled_insert_after)
@@ -48,6 +54,14 @@ TEST(uninode_list_test,filled_insert_after)
     ASSERT_EQ( list.load(0), thing::one );
     ASSERT_EQ( list.load(1), thing::forty_nine );
     ASSERT_EQ( list.load(2), thing::one );
+}
+
+TEST(uninode_list_test,filled_insert_first)
+{
+    auto list = uninode_list<thing>::filled(thing::one,1);
+    list.insert_first(thing::forty_nine);
+    ASSERT_EQ( list.load(0), thing::forty_nine );
+    ASSERT_EQ( list.load(1), thing::one );
 }
 
 TEST(uninode_list_test,filled_store_load)
