@@ -30,15 +30,25 @@ namespace br::dev::pedrolamarao::structures
             return current != that.current;
         }
 
+        // ---
+
         auto load ()
         {
             return *current;
         }
 
+        // ---
+
         // requires: ?
         auto next ()
         {
             return segment_list_position(current+1);
+        }
+
+        // requires: ?
+        auto previous ()
+        {
+            return segment_list_position(current-1);
         }
     };
 
@@ -68,5 +78,12 @@ namespace br::dev::pedrolamarao::structures
     auto next (segment_list_position<T> x)
     {
         return x.next();
+    }
+
+    export
+    template <typename T>
+    auto previous (segment_list_position<T> x)
+    {
+        return x.previous();
     }
 }
