@@ -373,6 +373,34 @@ namespace br::dev::pedrolamarao::structures
 
         // update
 
+        /// Inserts value after cursor position.
+        auto insert_after (uninode_list_cursor<T>& cursor, T value) requires copyable<T>
+        {
+            auto previous = cursor.node;
+            auto next = previous->link;
+            auto inserted = new uninode<T>(next,value);
+            previous->link = inserted;
+            return uninode_list_position<T>(inserted);
+        }
+
+        /// Inserts value after position.
+        auto insert_after (uninode_list_position<T> position, T value) requires copyable<T>
+        {
+            auto previous = position.node;
+            auto next = previous->link;
+            auto inserted = new uninode<T>(next,value);
+            previous->link = inserted;
+            return uninode_list_position<T>(inserted);
+        }
+
+        /// Inserts value at first position.
+        auto insert_first (T value) requires copyable<T>
+        {
+            auto next = root_ != nullptr ? root_ : nullptr;
+            root_ = new uninode<T>(next,value);
+            return uninode_list_position<T>(root_);
+        }
+
         // requires: index <= count
         void store (size_t index, T value)
         {

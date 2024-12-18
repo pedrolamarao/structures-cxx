@@ -19,11 +19,35 @@ TEST(uninode_list_test,defaultt)
     auto list = uninode_list<thing>();
 }
 
+TEST(uninode_list_test,default_insert_first)
+{
+    auto list = uninode_list<thing>();
+    list.insert_first(thing::forty_nine);
+    ASSERT_EQ( list.load(0), thing::forty_nine );
+}
+
 TEST(uninode_list_test,filled)
 {
     auto list = uninode_list<thing>::filled(thing::one,127);
     ASSERT_EQ( list.load(0),   thing::one );
     ASSERT_EQ( list.load(126), thing::one );
+}
+
+TEST(uninode_list_test,filled_insert_first)
+{
+    auto list = uninode_list<thing>::filled(thing::one,1);
+    list.insert_first(thing::forty_nine);
+    ASSERT_EQ( list.load(0), thing::forty_nine );
+    ASSERT_EQ( list.load(1), thing::one );
+}
+
+TEST(uninode_list_test,filled_insert_after)
+{
+    auto list = uninode_list<thing>::filled(thing::one,2);
+    list.insert_after(list.first(),thing::forty_nine);
+    ASSERT_EQ( list.load(0), thing::one );
+    ASSERT_EQ( list.load(1), thing::forty_nine );
+    ASSERT_EQ( list.load(2), thing::one );
 }
 
 TEST(uninode_list_test,filled_store_load)
