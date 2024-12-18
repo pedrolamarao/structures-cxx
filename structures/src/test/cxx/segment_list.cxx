@@ -19,11 +19,34 @@ TEST(segment_list_test,defaultt)
     auto list = segment_list<thing>();
 }
 
+TEST(segment_list_test,default_insert_first)
+{
+    auto list = segment_list<thing>();
+    list.insert_first(thing::forty_nine);
+    ASSERT_EQ( list.load(0), thing::forty_nine );
+}
+
+TEST(segment_list_test,default_insert_at)
+{
+    auto list = segment_list<thing>();
+    list.insert_at(2,thing::forty_nine);
+    ASSERT_EQ( list.load(2), thing::forty_nine );
+}
+
 TEST(segment_list_test,filled)
 {
     auto list = segment_list<thing>::filled(thing::one,127);
     ASSERT_EQ( list.load(0),   thing::one );
     ASSERT_EQ( list.load(126), thing::one );
+}
+
+TEST(segment_list_test,filled_insert_at)
+{
+    auto list = segment_list<thing>::filled(thing::one,2);
+    list.insert_at(1,thing::forty_nine);
+    ASSERT_EQ( list.load(0),thing::one );
+    ASSERT_EQ( list.load(1),thing::forty_nine );
+    ASSERT_EQ( list.load(2),thing::one );
 }
 
 TEST(segment_list_test,filled_store_load)

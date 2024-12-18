@@ -1,5 +1,6 @@
 module;
 
+#include <algorithm>
 #include <concepts>
 #include <cstdint>
 
@@ -138,6 +139,21 @@ namespace br::dev::pedrolamarao::structures
 
         // update
 
+        auto insert_at (size_t index, T value) requires copyable<T>
+        {
+            auto new_count = std::max(count_,index) + 1;
+            expand(new_count);
+            shift(index);
+            root_.base[index] = value;
+            count_ = new_count;
+            return segment_list_position<T>(root_.base+index);
+        }
+
+        auto insert_first (T value)
+        {
+            return insert_at(0,value);
+        }
+
         // requires: index <= count
         auto store (size_t index, T value)
         {
@@ -148,6 +164,31 @@ namespace br::dev::pedrolamarao::structures
         void store (segment_list_position<T> position, T value)
         {
             *(position.current) = value;
+        }
+
+    private:
+
+        // provides: [0,capacity) is initialized
+        void expand (size_t capacity) requires default_initializable<T> && copyable<T>
+        {
+            if (capacity <= root_.length)
+                return;
+            auto new_base = new T[capacity];
+            for (auto i = 0; i != count_; ++i)
+                new_base[i] = root_.base[i];
+            delete [] root_.base;
+            root_.base = new_base;
+            root_.length = capacity;
+        }
+
+        // requires: count < capacity
+        // requires: [0,capacity) is initialized
+        void shift (size_t index) requires copyable<T>
+        {
+            if (count_ <= index)
+                return;
+            for (auto i = count_; i != index; --i)
+                root_.base[i] = root_.base[i-1];
         }
     };
 
