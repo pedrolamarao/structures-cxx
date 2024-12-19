@@ -15,6 +15,8 @@ using std::max;
 namespace br::dev::pedrolamarao::structures
 {
     /// List on a segment.
+    ///
+    /// The list is projected onto the "words" of a memory segment.
     export
     template <typename T>
     class segment_list
@@ -34,10 +36,12 @@ namespace br::dev::pedrolamarao::structures
 
         // type
 
+        /// Constructs an empty list.
         segment_list () noexcept :
             segment_list({},0)
         { }
 
+        /// Moves that list into this list.
         segment_list (segment_list && that) noexcept :
             root_{that.root_}, count_{that.count_}
         {
@@ -45,6 +49,7 @@ namespace br::dev::pedrolamarao::structures
             that.count_ = {};
         }
 
+        /// Moves that list into this list.
         auto operator= (segment_list && that) noexcept -> segment_list&
         {
             root_ = that.root_;
@@ -58,6 +63,7 @@ namespace br::dev::pedrolamarao::structures
 
         auto operator= (segment_list const & that) = delete;
 
+        /// Destructs this list.
         ~segment_list ()
         {
             delete [] root_.base;
@@ -65,9 +71,9 @@ namespace br::dev::pedrolamarao::structures
 
         // factories
 
-        /**
-         * Creates a list filled with copies of a value.
-         */
+        /// Creates a list filled with copies of a value.
+        ///
+        /// Provides: distance(first,limit) == count
         template <typename TT>
         requires copyable<TT>
         static
@@ -82,6 +88,7 @@ namespace br::dev::pedrolamarao::structures
 
         // query
 
+        /// Position of the first element.
         auto first ()
         {
             return segment_list_position<T>(root_.base);
@@ -92,13 +99,17 @@ namespace br::dev::pedrolamarao::structures
             return count_ == 0;
         }
 
-        // requires: index <= count
+        /// Loads value at position.
+        ///
+        /// Requires: position in [first,limit)
         auto load (size_t index) const
         {
             return root_.base[index];
         }
 
-        // requires: position in [first,limit)
+        /// Loads value at position.
+        ///
+        /// Requires: position in [first,limit)
         auto load (segment_list_position<T> position) const
         {
             return *(position.current);

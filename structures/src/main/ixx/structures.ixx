@@ -4,6 +4,10 @@ module;
 
 export module br.dev.pedrolamarao.structures;
 
+export import :binode;
+export import :binode_list;
+export import :binode_list_position;
+
 export import :segment;
 export import :segment_list;
 export import :segment_list_position;

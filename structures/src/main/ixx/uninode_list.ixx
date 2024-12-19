@@ -12,6 +12,8 @@ using std::copyable;
 namespace br::dev::pedrolamarao::structures
 {
     /// List on uni-link nodes.
+    ///
+    /// The list is projected onto a circular bi-link node structure.
     export
     template <typename T>
     class uninode_list
@@ -28,6 +30,7 @@ namespace br::dev::pedrolamarao::structures
 
         // type
 
+        /// Constructs an empty list.
         uninode_list () noexcept :
             root_{}
         {
@@ -35,13 +38,15 @@ namespace br::dev::pedrolamarao::structures
             root_->link = root_;
         }
 
+        /// Moves that list into this list.
         uninode_list (uninode_list && that) noexcept :
             root_{that.root_}
         {
-            root_ = new uninode<T>;
-            root_->link = root_;
+            that.root_ = new uninode<T>;
+            that.root_->link = that.root_;
         }
 
+        /// Moves that list into this list.
         auto operator= (uninode_list && that) noexcept
         {
             using std::swap;
@@ -53,6 +58,7 @@ namespace br::dev::pedrolamarao::structures
 
         auto operator= (uninode_list const & that) = delete;
 
+        /// Destructs this list.
         ~uninode_list ()
         {
             auto node = root_->link;
@@ -88,6 +94,7 @@ namespace br::dev::pedrolamarao::structures
 
         // query
 
+        /// Position of the first element.
         auto first ()
         {
             return uninode_list_position<T>(root_->link);
@@ -103,7 +110,9 @@ namespace br::dev::pedrolamarao::structures
             return root_->link != root_;
         }
 
-        // requires: position in [first,limit)
+        /// Loads value at position.
+        ///
+        /// Requires: position in [first,limit)
         auto load (uninode_list_position<T> position) const
         {
             return position.node->content;
