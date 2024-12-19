@@ -17,18 +17,21 @@ enum class thing
 TEST(uninode_list_test,defaultt)
 {
     auto list = uninode_list<thing>();
+    ASSERT_EQ( list.first(), list.limit() );
 }
 
 TEST(uninode_list_test,default_insert_first)
 {
     auto list = uninode_list<thing>();
     list.insert_first(thing::forty_nine);
+    ASSERT_NE( list.first(), list.limit() );
     ASSERT_EQ( list.load(list.first()), thing::forty_nine );
 }
 
 TEST(uninode_list_test,filled)
 {
     auto list = uninode_list<thing>::filled(thing::one,127);
+    ASSERT_NE( list.first(), list.limit() );
     ASSERT_EQ( list.load(list.first()), thing::one );
 }
 

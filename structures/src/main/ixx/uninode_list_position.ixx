@@ -20,7 +20,7 @@ namespace br::dev::pedrolamarao::structures
 
         using value_type = T;
 
-        // regular
+        uninode_list_position () = delete;
 
         auto is_equal (uninode_list_position that)
         {
