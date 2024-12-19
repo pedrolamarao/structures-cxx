@@ -29,19 +29,21 @@ namespace br::dev::pedrolamarao::structures
         // type
 
         uninode_list () noexcept :
-            uninode_list{nullptr}
-        { }
+            root_{}
+        {
+            root_ = new uninode<T>(nullptr,{});
+        }
 
         uninode_list (uninode_list && that) noexcept :
             root_{that.root_}
         {
-            that.root_ = nullptr;
+            that.root_ = new uninode<T>(nullptr,{});
         }
 
         auto operator= (uninode_list && that) noexcept
         {
-            root_ = that.root_;
-            that.root_ = nullptr;
+            using std::swap;
+            swap(root_,that.root_);
             return *this;
         }
 
@@ -51,10 +53,11 @@ namespace br::dev::pedrolamarao::structures
 
         ~uninode_list ()
         {
-            while (root_ != nullptr) {
-                auto next = root_->link;
-                delete root_;
-                root_ = next;
+            auto node = root_;
+            while (node != nullptr) {
+                auto next = node->link;
+                delete node;
+                node = next;
             }
         }
 
@@ -68,12 +71,8 @@ namespace br::dev::pedrolamarao::structures
         static
         auto filled (TT value, size_t count)
         {
-            uninode<TT> * root = nullptr;
-            if (count > 0) {
-                root = new uninode<TT>(nullptr,value);
-                --count;
-            }
-            uninode<TT> * current = root;
+            auto root = new uninode<TT>(nullptr,{});
+            auto current = root;
             while (count > 0) {
                 auto next = new uninode<TT>(nullptr,value);
                 current->link = next;
@@ -87,12 +86,12 @@ namespace br::dev::pedrolamarao::structures
 
         auto first ()
         {
-            return uninode_list_position<T>(root_);
+            return uninode_list_position<T>(root_->link);
         }
 
         auto is_empty () const
         {
-            return root_ == nullptr;
+            return root_->link == nullptr;
         }
 
         // requires: position in [first,limit)
@@ -109,31 +108,29 @@ namespace br::dev::pedrolamarao::structures
         // update
 
         /// Erases element after position.
+        ///
+        /// Requires: first <= position < limit
         auto erase_after (position_type position)
         {
             auto previous = position.node;
-            if (previous == nullptr)
-                return;
             auto target = previous->link;
-            if (target == nullptr)
-                return;
-            previous->link = target->link;
+            auto next = target == nullptr ? nullptr : target->link;
+            previous->link = next;
             delete target;
         }
 
         /// Erases element at first position.
         auto erase_first ()
         {
-            if (root_ == nullptr)
-                return;
-            auto target = root_;
-            root_ = root_->link;
+            auto target = root_->link;
+            auto next = target == nullptr ? nullptr : target->link;
+            root_->link = next;
             delete target;
         }
 
         /// Inserts element after position.
         ///
-        /// Requires: first < position
+        /// Requires: first <= position < limit
         auto insert_after (uninode_list_position<T> position, T value) requires copyable<T>
         {
             auto previous = position.node;
@@ -146,9 +143,9 @@ namespace br::dev::pedrolamarao::structures
         /// Inserts element at first position.
         auto insert_first (T value) requires copyable<T>
         {
-            auto next = root_ != nullptr ? root_ : nullptr;
-            root_ = new uninode<T>(next,value);
-            return uninode_list_position<T>(root_);
+            auto inserted = new uninode<T>(root_->link,value);
+            root_->link = inserted;
+            return uninode_list_position<T>(inserted);
         }
 
         // requires: ?
