@@ -13,7 +13,7 @@ namespace br::dev::pedrolamarao::structures
 {
     /// List on uni-link nodes.
     ///
-    /// The list is projected onto a circular bi-link node structure.
+    /// The list is projected onto a circular uni-link node structure.
     export
     template <typename T>
     class uninode_list
