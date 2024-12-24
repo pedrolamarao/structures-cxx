@@ -13,11 +13,13 @@ using std::max;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// Stack on a segment.
+    /// Linear sequence with insert and remove at "top"
+    /// projected onto a memory segment.
     ///
-    /// The stack is projected onto the "words" of a memory segment.
-    /// The lowest "word" stores the bottom of the stack,
-    /// the highest "word" stores the top of the stack.
+    /// Actual elements are stored in "words" [0,count).
+    /// The first "word" stores the first element.
+    /// Subsequent "words" stores subsequent elements.
+    /// The last element is the "top" element.
     export
     template <typename T>
     class segment_stack

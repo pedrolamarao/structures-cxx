@@ -2,7 +2,7 @@ export module br.dev.pedrolamarao.structures:binode;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// Memory node with two links.
+    /// Sparse memory positions explicitly related by two "links".
     export
     template <typename T>
     struct binode

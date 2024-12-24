@@ -14,9 +14,11 @@ using std::max;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// List on a segment.
+    /// Linear sequence projected onto a memory segment.
     ///
-    /// The list is projected onto the "words" of a memory segment.
+    /// Actual elements are stored in "words" [0,count).
+    /// The first "word" stores the first element.
+    /// Subsequent "words" stores subsequent elements.
     export
     template <typename T>
     class segment_list

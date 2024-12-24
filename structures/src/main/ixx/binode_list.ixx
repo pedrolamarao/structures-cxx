@@ -11,9 +11,13 @@ using std::copyable;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// List on bi-link nodes.
+    /// Linear sequence projected onto bi-linked memory nodes.
     ///
-    /// The list is projected onto a circular bi-link node structure.
+    /// The root node links to the first and last elements.
+    /// The first element links left to root and right to next.
+    /// Intermediate elements link left to previous and right to next.
+    /// The last element links left to previous and right to root.
+    /// Therefore, the root node marks the end of the sequence at both extremities.
     export
     template <typename T>
     class binode_list

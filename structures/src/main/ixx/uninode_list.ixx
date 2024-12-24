@@ -11,9 +11,12 @@ using std::copyable;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// List on uni-link nodes.
+    /// Linear sequence projected onto uni-linked memory nodes.
     ///
-    /// The list is projected onto a circular uni-link node structure.
+    /// The root node links to the first element.
+    /// Intermediate elements link to next.
+    /// The last element links to root.
+    /// Therefore, the root node marks the end of the sequence.
     export
     template <typename T>
     class uninode_list
