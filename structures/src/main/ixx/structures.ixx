@@ -16,6 +16,7 @@ export import :segment_stack;
 export import :uninode;
 export import :uninode_list;
 export import :uninode_list_position;
+export import :uninode_stack;
 
 using namespace std;
 

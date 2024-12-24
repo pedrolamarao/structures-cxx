@@ -82,8 +82,10 @@ namespace br::dev::pedrolamarao::structures
             return count_ != 0;
         }
 
-        /// Position of the top element.
-        auto top ()
+        /// Top of the stack.
+        ///
+        /// Requires: not_empty
+        auto top () -> value_type
         {
             return root_.base[ count_ - 1 ];
         }
@@ -91,6 +93,8 @@ namespace br::dev::pedrolamarao::structures
         // update
 
         /// Erases from the stack.
+        ///
+        /// Requires: not_empty
         void erase ()
         {
             --count_;
