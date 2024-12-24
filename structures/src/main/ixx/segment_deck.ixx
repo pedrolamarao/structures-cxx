@@ -3,7 +3,7 @@ module;
 #include <algorithm>
 #include <concepts>
 
-export module br.dev.pedrolamarao.structures:segment_stack;
+export module br.dev.pedrolamarao.structures:segment_deck;
 
 import :segment;
 
@@ -13,21 +13,20 @@ using std::max;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// Linear sequence with access at "top"
+    /// Linear sequence with access at "bottom" and "top"
     /// projected onto a memory segment.
     ///
     /// Actual elements are stored in "words" [0,count).
-    /// The first "word" stores the first element.
-    /// Subsequent "words" stores subsequent elements.
-    /// The last element is the "top" element.
+    /// The first "word" stores the "bottom" element.
+    /// The last "word" stores the "top" element.
     export
     template <typename T>
-    class segment_stack
+    class segment_deck
     {
         segment<T> root_;
         size_t     count_;
 
-        explicit segment_stack (segment<T> r, size_t c) noexcept :
+        explicit segment_deck (segment<T> r, size_t c) noexcept :
             root_{r},count_{c}
         { }
 
@@ -37,21 +36,21 @@ namespace br::dev::pedrolamarao::structures
 
         // type
 
-        /// Constructs an empty stack.
-        segment_stack () noexcept :
-            segment_stack({},0)
+        /// Constructs an empty deck.
+        segment_deck () noexcept :
+            segment_deck({},0)
         { }
 
-        /// Moves that stack into this stack.
-        segment_stack (segment_stack && that) noexcept :
+        /// Moves that deck into this deck.
+        segment_deck (segment_deck && that) noexcept :
             root_{that.root_}, count_{that.count_}
         {
             that.root_ = {};
             that.count_ = {};
         }
 
-        /// Moves that stack into this stack.
-        auto operator= (segment_stack && that) noexcept -> segment_stack&
+        /// Moves that deck into this deck.
+        auto operator= (segment_deck && that) noexcept -> segment_deck&
         {
             root_ = that.root_;
             count_ = that.count_;
@@ -60,17 +59,25 @@ namespace br::dev::pedrolamarao::structures
             return *this;
         }
 
-        segment_stack (segment_stack const & that) = delete;
+        segment_deck (segment_deck const & that) = delete;
 
-        auto operator= (segment_stack const & that) = delete;
+        auto operator= (segment_deck const & that) = delete;
 
-        /// Destructs this stack.
-        ~segment_stack ()
+        /// Destructs this deck.
+        ~segment_deck ()
         {
             delete [] root_.base;
         }
 
         // query
+
+        /// Bottom of the deck.
+        ///
+        /// Requires: not_empty
+        auto bottom () -> value_type
+        {
+            return root_.base[0];
+        }
 
         auto is_empty () const
         {
@@ -82,7 +89,7 @@ namespace br::dev::pedrolamarao::structures
             return count_ != 0;
         }
 
-        /// Top of the stack.
+        /// Top of the deck.
         ///
         /// Requires: not_empty
         auto top () -> value_type
@@ -92,16 +99,35 @@ namespace br::dev::pedrolamarao::structures
 
         // update
 
-        /// Erases from the stack.
+        /// Erases from the bottom.
         ///
         /// Requires: not_empty
-        void erase ()
+        void erase_bottom ()
+        {
+            shift_left(root_,0,count_);
+            --count_;
+        }
+
+        /// Erases from the top.
+        ///
+        /// Requires: not_empty
+        void erase_top ()
         {
             --count_;
         }
 
-        /// Inserts into the stack.
-        void insert (T value) requires copyable<T>
+        /// Inserts into the bottom.
+        void insert_bottom (T value) requires copyable<T>
+        {
+            auto new_count = count_ + 1;
+            expand(new_count);
+            shift_right(root_,0,count_);
+            root_.base[0] = value;
+            count_ = new_count;
+        }
+
+        /// Inserts into the top.
+        void insert_top (T value) requires copyable<T>
         {
             auto new_count = count_ + 1;
             expand(new_count);

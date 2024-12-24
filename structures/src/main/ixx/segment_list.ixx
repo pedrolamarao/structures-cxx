@@ -126,7 +126,7 @@ namespace br::dev::pedrolamarao::structures
 
         void erase_at (size_t index)
         {
-            shift_left(index,count_);
+            shift_left(root_,index,count_);
             --count_;
         }
 
@@ -179,21 +179,11 @@ namespace br::dev::pedrolamarao::structures
             root_.length = capacity;
         }
 
-        // requires: position < limit
-        void shift_left (size_t position, size_t limit) requires copyable<T>
-        {
-            for (auto i = position, j = position+1; j != limit; ++i, ++j)
-                root_.base[i] = root_.base[j];
-        }
-
-        // requires: count < capacity
-        // requires: [0,capacity) is initialized
-        void shift_right (size_t index) requires copyable<T>
+        void shift_right (size_t index)
         {
             if (count_ <= index)
                 return;
-            for (auto i = count_; i != index; --i)
-                root_.base[i] = root_.base[i-1];
+            structures::shift_right(root_,index,count_);
         }
     };
 }

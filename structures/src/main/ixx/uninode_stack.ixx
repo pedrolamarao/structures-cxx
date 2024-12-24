@@ -10,7 +10,7 @@ using std::copyable;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// Linear sequence with insert and remove at "top"
+    /// Linear sequence with access at "top"
     /// projected onto uni-linked memory nodes.
     ///
     /// The root node links to the last element.

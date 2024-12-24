@@ -9,6 +9,7 @@ export import :binode_list;
 export import :binode_list_position;
 
 export import :segment;
+export import :segment_deck;
 export import :segment_list;
 export import :segment_list_position;
 export import :segment_stack;
