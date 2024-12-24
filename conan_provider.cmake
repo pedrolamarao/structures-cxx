@@ -612,7 +612,7 @@ macro(conan_provide_dependency method package_name)
     #       find_package (<PackageName> PATHS paths... NO_DEFAULT_PATH)
     #       find_package (<PackageName>)
 
-    # Filter out `REQUIRED` from the argument list, as the first call may fail
+    # Filter out `REQUIRED` from the argument stack, as the first call may fail
     set(_find_args_${package_name} "${ARGN}")
     list(REMOVE_ITEM _find_args_${package_name} "REQUIRED")
     if(NOT "MODULE" IN_LIST _find_args_${package_name})

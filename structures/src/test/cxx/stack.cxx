@@ -14,9 +14,22 @@ enum class thing
     forty_nine = 49u,
 };
 
-TEST(segment_stack_test,default_insert)
+template <typename T>
+struct stack_test : testing::Test
 {
-    auto stack = segment_stack<thing>();
+    static_assert( stack<T> );
+};
+
+using types = testing::Types<
+    segment_stack<thing>,
+    uninode_stack<thing>
+>;
+
+TYPED_TEST_SUITE(stack_test,types);
+
+TYPED_TEST(stack_test,default_insert)
+{
+    TypeParam stack;
     ASSERT_TRUE( stack.is_empty() );
 
     stack.insert(thing::one);

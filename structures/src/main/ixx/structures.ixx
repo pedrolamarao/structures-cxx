@@ -49,6 +49,81 @@ namespace br::dev::pedrolamarao::structures
         return x.not_equal(y);
     }
 
+    /// Linear structure with "random" access.
+    export
+    template <typename List>
+    concept list = requires (List list)
+    {
+        typename List::value_type;
+
+        default_initializable< typename List::value_type >;
+
+        typename List::position_type;
+
+        position< typename List::position_type >;
+
+        same_as< typename List::value_type, typename List::position_type::value_type >;
+
+        { list.before_first() } -> same_as< typename List::position_type >;
+
+        { list.first() } -> same_as< typename List::position_type >;
+
+        { list.last() } -> same_as< typename List::position_type >;
+
+        { list.after_last() } -> same_as< typename List::position_type >;
+
+        requires requires (typename List::position_type position, typename List::value_type value)
+        {
+            { list.erase_after(position) };
+
+            { list.insert_after(position,value) } -> same_as< typename List::position_type >;
+        };
+    };
+
+    /// Linear structure with access to the bottom and the top.
+    export
+    template <typename Deck>
+    concept deck = requires (Deck deck)
+    {
+        typename Deck::value_type;
+
+        default_initializable< typename Deck::value_type >;
+
+        { deck.bottom() } -> same_as< typename Deck::value_type >;
+
+        { deck.top() } -> same_as< typename Deck::value_type >;
+
+        { deck.erase_bottom() };
+
+        { deck.erase_top() };
+
+        requires requires (typename Deck::value_type value)
+        {
+            { deck.insert_bottom(value) };
+
+            { deck.insert_top(value) };
+        };
+    };
+
+    /// Linear structure with access to the top.
+    export
+    template <typename Stack>
+    concept stack = requires (Stack stack)
+    {
+        typename Stack::value_type;
+
+        default_initializable< typename Stack::value_type >;
+
+        { stack.top() } -> same_as< typename Stack::value_type >;
+
+        { stack.erase() };
+
+        requires requires (typename Stack::value_type value)
+        {
+            { stack.insert(value) };
+        };
+    };
+
     /// Structural position with forward traversal.
     export
     template <typename Position>
