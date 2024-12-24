@@ -24,9 +24,31 @@ TEST(sandbox,empty_insert_end)
     ASSERT_EQ( *list.begin(), thing::one );
 }
 
+auto hole (thing x)
+{
+    return x;
+}
+
+TEST(sandbox,empty_load_end)
+{
+    auto list = std::list<thing>();
+    auto end = list.end();
+    hole( *end );
+}
+
 TEST(sandbox,nonempty_insert_end)
 {
     auto list = std::list<thing>{ thing::one, thing::two };
     list.insert(list.end(),thing::forty_nine);
     ASSERT_EQ( *list.begin(), thing::one );
+}
+
+TEST(sandbox,nonempty_load_end)
+{
+    auto list = std::list<thing>();
+    list.insert(list.end(),thing::forty_nine);
+    auto end = list.end();
+    hole( *end );
+    ++end;
+    hole( *end );
 }

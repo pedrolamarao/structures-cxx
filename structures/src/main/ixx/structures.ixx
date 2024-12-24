@@ -11,6 +11,7 @@ export import :binode_list_position;
 export import :segment;
 export import :segment_list;
 export import :segment_list_position;
+export import :segment_stack;
 
 export import :uninode;
 export import :uninode_list;
