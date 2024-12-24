@@ -6,8 +6,11 @@
       "binaryDir": "build",
       "generator": "Ninja",
       "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_C_COMPILER": "clang",
+        "CMAKE_C_FLAGS": "-g -fno-inline-functions",
         "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_CXX_FLAGS": "-g -fno-inline-functions",
         "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "conan_provider.cmake"
       }
     }
