@@ -2,27 +2,27 @@ module;
 
 #include <concepts>
 
-export module br.dev.pedrolamarao.structures:binode_list;
+export module br.dev.pedrolamarao.structures:binode_deck;
 
 import :binode;
-import :binode_list_position;
 
 using std::copyable;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// Linear sequence projected onto bi-linked memory nodes.
+    /// Linear sequence with access at "bottom" and "top"
+    /// projected onto bi-linked memory nodes.
     ///
-    /// Nodes link left towards first and right towards last.
-    /// The root node links right with the first node
-    /// and links left with the last node.
+    /// Nodes link left towards bottom and right towards top.
+    /// The root node links right with the bottom node
+    /// and links left with the top node.
     export
     template <typename T>
-    class binode_list
+    class binode_deck
     {
         binode<T>* root_;
 
-        explicit binode_list (binode<T>* root) noexcept :
+        explicit binode_deck (binode<T>* root) noexcept :
             root_{root}
         { }
 
@@ -30,40 +30,38 @@ namespace br::dev::pedrolamarao::structures
 
         using value_type = T;
 
-        using position_type = binode_list_position<T>;
-
         // type
 
-        /// Constructs an empty list.
-        binode_list () :
+        /// Constructs an empty deck.
+        binode_deck () :
             root_ {}
         {
             root_ = new binode<T>;
             link(root_,root_);
         }
 
-        /// Moves that list into this list.
-        binode_list (binode_list && that) noexcept :
+        /// Moves that deck into this deck.
+        binode_deck (binode_deck && that) noexcept :
             root_{that.root_}
         {
             that.root_ = new binode<T>;
             link(that.root_,that.root_);
         }
 
-        /// Moves that list into this list.
-        auto operator= (binode_list && that) noexcept
+        /// Moves that deck into this deck.
+        auto operator= (binode_deck && that) noexcept
         {
             using std::swap;
             swap(this->root_,that.root_);
             return *this;
         }
 
-        binode_list (binode_list const & that) = delete;
+        binode_deck (binode_deck const & that) = delete;
 
-        auto operator= (binode_list const & that) = delete;
+        auto operator= (binode_deck const & that) = delete;
 
-        /// Destructs this list.
-        ~binode_list ()
+        /// Destructs this deck.
+        ~binode_deck ()
         {
             auto node = root_->right;
             while (node != root_) {
@@ -76,7 +74,7 @@ namespace br::dev::pedrolamarao::structures
 
         // factories
 
-        /// Creates a list filled with copies of a value.
+        /// Creates a deck filled with copies of a value.
         ///
         /// Provides: distance(first,limit) == count
         template <typename TT>
@@ -94,15 +92,14 @@ namespace br::dev::pedrolamarao::structures
                 --count;
             }
             link(current,root);
-            return binode_list<TT>(root);
+            return binode_deck<TT>(root);
         }
 
         // query
 
-        /// Position of the first element.
-        auto first ()
+        auto bottom () -> value_type
         {
-            return binode_list_position<T>(root_->right);
+            return root_->right->content;
         }
 
         auto is_empty () const
@@ -115,49 +112,49 @@ namespace br::dev::pedrolamarao::structures
             return root_->right != root_;
         }
 
-        /// Loads value at position.
-        ///
-        /// Requires: position in [first,limit)
-        auto load (binode_list_position<T> position) const
+        auto top () -> value_type
         {
-            return position.node->content;
-        }
-
-        auto limit ()
-        {
-            return binode_list_position<T>(root_);
+            return root_->left->content;
         }
 
         // update
 
-        /// Erases element at position.
-        ///
-        /// Requires: first <= position < limit
-        auto erase_at (position_type position)
+        void erase_bottom ()
         {
-            auto target = position.node;
+            auto target = root_->right;
             auto previous = target->left;
             auto next = target->right;
             link(previous,next);
             delete target;
         }
 
-        /// Inserts element at position.
-        auto insert_at (binode_list_position<T> position, T value) requires copyable<T>
+        void erase_top ()
         {
-            auto next = position.node;
+            auto target = root_->left;
+            auto previous = target->left;
+            auto next = target->right;
+            link(previous,next);
+            delete target;
+        }
+
+        void insert_bottom (T value)
+        {
+            auto next = root_->right;
             auto previous = next->left;
             auto inserted = new binode<T>;
             link(previous,inserted);
             link(inserted,next);
             inserted->content = value;
-            return binode_list_position<T>(inserted);
         }
 
-        /// Requires: first <= position < limit
-        void store (binode_list_position<T> position, T value) requires copyable<T>
+        void insert_top (T value)
         {
-            position.node->content = value;
+            auto previous = root_->left;
+            auto next = previous->right;
+            auto inserted = new binode<T>;
+            link(previous,inserted);
+            link(inserted,next);
+            inserted->content = value;
         }
     };
 }

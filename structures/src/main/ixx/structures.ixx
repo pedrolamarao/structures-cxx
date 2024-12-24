@@ -5,6 +5,7 @@ module;
 export module br.dev.pedrolamarao.structures;
 
 export import :binode;
+export import :binode_deck;
 export import :binode_list;
 export import :binode_list_position;
 

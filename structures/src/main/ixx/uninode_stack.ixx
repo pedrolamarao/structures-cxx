@@ -13,11 +13,9 @@ namespace br::dev::pedrolamarao::structures
     /// Linear sequence with access at "top"
     /// projected onto uni-linked memory nodes.
     ///
-    /// The root node links to the last element.
-    /// Intermediate elements link to previous.
-    /// The first element links to root.
-    /// Therefore, the root node marks the end of the sequence.
-    /// The last element is the "top" element.
+    /// Nodes link towards bottom.
+    /// The root node links to the top node
+    /// and bottom node links to nowhere.
     export
     template <typename T>
     class uninode_stack

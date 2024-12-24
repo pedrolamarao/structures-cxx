@@ -13,10 +13,9 @@ namespace br::dev::pedrolamarao::structures
 {
     /// Linear sequence projected onto uni-linked memory nodes.
     ///
-    /// The root node links to the first element.
-    /// Intermediate elements link to next.
-    /// The last element links to root.
-    /// Therefore, the root node marks the end of the sequence.
+    /// Nodes link towards last.
+    /// The root node links to the first node
+    /// and the last node links to the root node.
     export
     template <typename T>
     class uninode_list
