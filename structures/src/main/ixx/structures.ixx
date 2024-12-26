@@ -8,6 +8,7 @@ export import :binode;
 export import :binode_deck;
 export import :binode_list;
 export import :binode_list_position;
+export import :binode_queue;
 
 export import :segment;
 export import :segment_deck;
@@ -51,76 +52,103 @@ namespace br::dev::pedrolamarao::structures
 
     /// Linear structure with "random" access.
     export
-    template <typename List>
-    concept list = requires (List list)
+    template <typename Structure>
+    concept list = requires (Structure structure)
     {
-        typename List::value_type;
+        default_initializable<Structure>;
 
-        default_initializable< typename List::value_type >;
+        typename Structure::value_type;
 
-        typename List::position_type;
+        default_initializable< typename Structure::value_type >;
 
-        position< typename List::position_type >;
+        typename Structure::position_type;
 
-        same_as< typename List::value_type, typename List::position_type::value_type >;
+        position< typename Structure::position_type >;
 
-        { list.before_first() } -> same_as< typename List::position_type >;
+        same_as< typename Structure::value_type, typename Structure::position_type::value_type >;
 
-        { list.first() } -> same_as< typename List::position_type >;
+        { structure.before_first() } -> same_as< typename Structure::position_type >;
 
-        { list.last() } -> same_as< typename List::position_type >;
+        { structure.first() } -> same_as< typename Structure::position_type >;
 
-        { list.after_last() } -> same_as< typename List::position_type >;
+        { structure.last() } -> same_as< typename Structure::position_type >;
 
-        requires requires (typename List::position_type position, typename List::value_type value)
+        { structure.after_last() } -> same_as< typename Structure::position_type >;
+
+        requires requires (typename Structure::position_type position, typename Structure::value_type value)
         {
-            { list.erase_after(position) };
+            { structure.erase_after(position) };
 
-            { list.insert_after(position,value) } -> same_as< typename List::position_type >;
+            { structure.insert_after(position,value) } -> same_as< typename Structure::position_type >;
         };
     };
 
     /// Linear structure with access to the bottom and the top.
     export
-    template <typename Deck>
-    concept deck = requires (Deck deck)
+    template <typename Structure>
+    concept deck = requires (Structure structure)
     {
-        typename Deck::value_type;
+        default_initializable<Structure>;
 
-        default_initializable< typename Deck::value_type >;
+        typename Structure::value_type;
 
-        { deck.bottom() } -> same_as< typename Deck::value_type >;
+        default_initializable< typename Structure::value_type >;
 
-        { deck.top() } -> same_as< typename Deck::value_type >;
+        { structure.bottom() } -> same_as< typename Structure::value_type >;
 
-        { deck.erase_bottom() };
+        { structure.top() } -> same_as< typename Structure::value_type >;
 
-        { deck.erase_top() };
+        { structure.erase_bottom() };
 
-        requires requires (typename Deck::value_type value)
+        { structure.erase_top() };
+
+        requires requires (typename Structure::value_type value)
         {
-            { deck.insert_bottom(value) };
+            { structure.insert_bottom(value) };
 
-            { deck.insert_top(value) };
+            { structure.insert_top(value) };
         };
     };
 
     /// Linear structure with access to the top.
     export
-    template <typename Stack>
-    concept stack = requires (Stack stack)
+    template <typename Structure>
+    concept stack = requires (Structure structure)
     {
-        typename Stack::value_type;
+        default_initializable<Structure>;
 
-        default_initializable< typename Stack::value_type >;
+        typename Structure::value_type;
 
-        { stack.top() } -> same_as< typename Stack::value_type >;
+        default_initializable< typename Structure::value_type >;
 
-        { stack.erase() };
+        { structure.top() } -> same_as< typename Structure::value_type >;
 
-        requires requires (typename Stack::value_type value)
+        { structure.erase() };
+
+        requires requires (typename Structure::value_type value)
         {
-            { stack.insert(value) };
+            { structure.insert(value) };
+        };
+    };
+
+    /// Linear structure with insertion at back and access at front.
+    export
+    template <typename Structure>
+    concept queue = requires (Structure structure)
+    {
+        default_initializable<Structure>;
+
+        typename Structure::value_type;
+
+        default_initializable< typename Structure::value_type >;
+
+        { structure.front() } -> same_as< typename Structure::value_type >;
+
+        { structure.remove() };
+
+        requires requires (typename Structure::value_type value)
+        {
+            { structure.insert(value) };
         };
     };
 
