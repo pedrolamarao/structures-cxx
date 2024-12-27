@@ -14,13 +14,12 @@ enum class thing
     forty_nine = 49u,
 };
 
-TEST(binode_list_test,filled)
+TEST(uninode_list_test,filled)
 {
-    auto filled = binode_list<thing>::filled(thing::forty_nine,49);
+    auto filled = uninode_list<thing>::filled(thing::forty_nine,49);
     ASSERT_FALSE( filled.is_empty() );
 
     auto moved = std::move(filled);
     ASSERT_FALSE( moved.is_empty() );
     ASSERT_TRUE( filled.is_empty() );
 }
-

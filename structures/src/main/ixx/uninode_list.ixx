@@ -33,7 +33,7 @@ namespace br::dev::pedrolamarao::structures
         // type
 
         /// Constructs an empty list.
-        uninode_list () noexcept :
+        uninode_list () :
             root_{}
         {
             root_ = new uninode<T>;
@@ -41,7 +41,7 @@ namespace br::dev::pedrolamarao::structures
         }
 
         /// Moves that list into this list.
-        uninode_list (uninode_list && that) noexcept :
+        uninode_list (uninode_list && that) :
             root_{that.root_}
         {
             that.root_ = new uninode<T>;
@@ -49,7 +49,7 @@ namespace br::dev::pedrolamarao::structures
         }
 
         /// Moves that list into this list.
-        auto operator= (uninode_list && that) noexcept
+        auto operator= (uninode_list && that)
         {
             using std::swap;
             swap(root_,that.root_);

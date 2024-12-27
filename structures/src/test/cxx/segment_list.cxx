@@ -13,3 +13,13 @@ enum class thing
     two        =  2u,
     forty_nine = 49u,
 };
+
+TEST(segment_list_test,filled)
+{
+    auto filled = segment_list<thing>::filled(thing::forty_nine,49);
+    ASSERT_FALSE( filled.is_empty() );
+
+    auto moved = std::move(filled);
+    ASSERT_FALSE( moved.is_empty() );
+    ASSERT_TRUE( filled.is_empty() );
+}

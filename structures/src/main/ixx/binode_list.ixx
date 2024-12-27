@@ -43,7 +43,7 @@ namespace br::dev::pedrolamarao::structures
         }
 
         /// Moves that list into this list.
-        binode_list (binode_list && that) noexcept :
+        binode_list (binode_list && that) :
             root_{that.root_}
         {
             that.root_ = new binode<T>;
@@ -51,7 +51,7 @@ namespace br::dev::pedrolamarao::structures
         }
 
         /// Moves that list into this list.
-        auto operator= (binode_list && that) noexcept
+        auto operator= (binode_list && that)
         {
             using std::swap;
             swap(this->root_,that.root_);
