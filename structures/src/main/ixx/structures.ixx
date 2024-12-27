@@ -4,6 +4,12 @@ module;
 
 export module br.dev.pedrolamarao.structures;
 
+export import :deck;
+export import :list;
+export import :position;
+export import :queue;
+export import :stack;
+
 export import :binode;
 export import :binode_deck;
 export import :binode_list;
@@ -25,133 +31,6 @@ using namespace std;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// Structural position.
-    export
-    template <typename Position>
-    concept position = requires (Position position)
-    {
-        typename Position::value_type;
-        { is_equal(position,position) } -> convertible_to<bool>;
-        { not_equal(position,position) } -> convertible_to<bool>;
-        { load(position) } -> convertible_to<typename Position::value_type>;
-    };
-
-    export
-    template <position P>
-    auto operator== (P x, P y)
-    {
-        return x.is_equal(y);
-    }
-
-    export
-    template <position P>
-    auto operator!= (P x, P y)
-    {
-        return x.not_equal(y);
-    }
-
-    /// Linear structure with "random" access.
-    export
-    template <typename Structure>
-    concept list = requires (Structure structure)
-    {
-        default_initializable<Structure>;
-
-        typename Structure::value_type;
-
-        default_initializable< typename Structure::value_type >;
-
-        typename Structure::position_type;
-
-        position< typename Structure::position_type >;
-
-        same_as< typename Structure::value_type, typename Structure::position_type::value_type >;
-
-        { structure.before_first() } -> same_as< typename Structure::position_type >;
-
-        { structure.first() } -> same_as< typename Structure::position_type >;
-
-        { structure.last() } -> same_as< typename Structure::position_type >;
-
-        { structure.after_last() } -> same_as< typename Structure::position_type >;
-
-        requires requires (typename Structure::position_type position, typename Structure::value_type value)
-        {
-            { structure.erase_after(position) };
-
-            { structure.insert_after(position,value) } -> same_as< typename Structure::position_type >;
-        };
-    };
-
-    /// Linear structure with access to the bottom and the top.
-    export
-    template <typename Structure>
-    concept deck = requires (Structure structure)
-    {
-        default_initializable<Structure>;
-
-        typename Structure::value_type;
-
-        default_initializable< typename Structure::value_type >;
-
-        { structure.bottom() } -> same_as< typename Structure::value_type >;
-
-        { structure.top() } -> same_as< typename Structure::value_type >;
-
-        { structure.erase_bottom() };
-
-        { structure.erase_top() };
-
-        requires requires (typename Structure::value_type value)
-        {
-            { structure.insert_bottom(value) };
-
-            { structure.insert_top(value) };
-        };
-    };
-
-    /// Linear structure with access to the top.
-    export
-    template <typename Structure>
-    concept stack = requires (Structure structure)
-    {
-        default_initializable<Structure>;
-
-        typename Structure::value_type;
-
-        default_initializable< typename Structure::value_type >;
-
-        { structure.top() } -> same_as< typename Structure::value_type >;
-
-        { structure.erase() };
-
-        requires requires (typename Structure::value_type value)
-        {
-            { structure.insert(value) };
-        };
-    };
-
-    /// Linear structure with insertion at back and access at front.
-    export
-    template <typename Structure>
-    concept queue = requires (Structure structure)
-    {
-        default_initializable<Structure>;
-
-        typename Structure::value_type;
-
-        default_initializable< typename Structure::value_type >;
-
-        { structure.front() } -> same_as< typename Structure::value_type >;
-
-        { structure.remove() };
-
-        requires requires (typename Structure::value_type value)
-        {
-            { structure.insert(value) };
-        };
-    };
-
     /// Structural position with forward traversal.
     export
     template <typename Position>

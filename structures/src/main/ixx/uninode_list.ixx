@@ -96,6 +96,18 @@ namespace br::dev::pedrolamarao::structures
 
         // query
 
+        /// Position after the last element.
+        auto after_last ()
+        {
+            return uninode_list_position<T>(root_);
+        }
+
+        /// Position before the first element.
+        auto before_first ()
+        {
+            return uninode_list_position<T>(root_);
+        }
+
         /// Position of the first element.
         auto first ()
         {
@@ -110,19 +122,6 @@ namespace br::dev::pedrolamarao::structures
         auto not_empty () const
         {
             return root_->link != root_;
-        }
-
-        /// Loads value at position.
-        ///
-        /// Requires: position in [first,limit)
-        auto load (uninode_list_position<T> position) const
-        {
-            return position.node->content;
-        }
-
-        auto limit ()
-        {
-            return uninode_list_position<T>(root_);
         }
 
         // update
@@ -168,12 +167,6 @@ namespace br::dev::pedrolamarao::structures
             auto inserted = new uninode<T>(root_->link,value);
             root_->link = inserted;
             return uninode_list_position<T>(inserted);
-        }
-
-        // requires: ?
-        void store (uninode_list_position<T> position, T value)
-        {
-            position.node->content = value;
         }
     };
 }

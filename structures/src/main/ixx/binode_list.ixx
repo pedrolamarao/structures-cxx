@@ -99,6 +99,18 @@ namespace br::dev::pedrolamarao::structures
 
         // query
 
+        /// Position after the last element.
+        auto after_last ()
+        {
+            return binode_list_position<T>(root_);
+        }
+
+        /// Position before the first element.
+        auto before_first ()
+        {
+            return binode_list_position<T>(root_);
+        }
+
         /// Position of the first element.
         auto first ()
         {
@@ -115,20 +127,15 @@ namespace br::dev::pedrolamarao::structures
             return root_->right != root_;
         }
 
-        /// Loads value at position.
-        ///
-        /// Requires: position in [first,limit)
-        auto load (binode_list_position<T> position) const
-        {
-            return position.node->content;
-        }
-
-        auto limit ()
-        {
-            return binode_list_position<T>(root_);
-        }
-
         // update
+
+        void erase_after (position_type position)
+        {
+            auto node = position.node;
+            auto target = node->right;
+            link(node,target->right);
+            delete target;
+        }
 
         /// Erases element at position.
         ///
@@ -142,8 +149,21 @@ namespace br::dev::pedrolamarao::structures
             delete target;
         }
 
+        auto insert_after (position_type position, T value) -> position_type
+        requires copyable<T>
+        {
+            auto inserted = new binode<T>;
+            inserted->content = value;
+            auto previous = position.node;
+            auto next = previous->right;
+            link(previous,inserted);
+            link(inserted,next);
+            return position_type(inserted);
+        }
+
         /// Inserts element at position.
-        auto insert_at (binode_list_position<T> position, T value) requires copyable<T>
+        auto insert_at (binode_list_position<T> position, T value)
+        requires copyable<T>
         {
             auto next = position.node;
             auto previous = next->left;
@@ -152,12 +172,6 @@ namespace br::dev::pedrolamarao::structures
             link(inserted,next);
             inserted->content = value;
             return binode_list_position<T>(inserted);
-        }
-
-        /// Requires: first <= position < limit
-        void store (binode_list_position<T> position, T value) requires copyable<T>
-        {
-            position.node->content = value;
         }
     };
 }

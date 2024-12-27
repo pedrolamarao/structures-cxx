@@ -90,6 +90,18 @@ namespace br::dev::pedrolamarao::structures
 
         // query
 
+        /// Position after the last element.
+        auto after_last ()
+        {
+            return segment_list_position<T>(root_.base + count_);
+        }
+
+        /// Position before the first element.
+        auto before_first ()
+        {
+            return segment_list_position<T>(root_.base - 1);
+        }
+
         /// Position of the first element.
         auto first ()
         {
@@ -101,28 +113,17 @@ namespace br::dev::pedrolamarao::structures
             return count_ == 0;
         }
 
-        /// Loads value at position.
-        ///
-        /// Requires: position in [first,limit)
-        auto load (size_t index) const
+        auto not_empty () const
         {
-            return root_.base[index];
-        }
-
-        /// Loads value at position.
-        ///
-        /// Requires: position in [first,limit)
-        auto load (segment_list_position<T> position) const
-        {
-            return *(position.current);
-        }
-
-        auto limit ()
-        {
-            return segment_list_position<T>(root_.base+count_);
+            return count_ != 0;
         }
 
         // update
+
+        void erase_after (position_type position)
+        {
+            erase_at(next(position));
+        }
 
         void erase_at (size_t index)
         {
@@ -136,6 +137,12 @@ namespace br::dev::pedrolamarao::structures
             erase_at(index);
         }
 
+        auto insert_after (position_type position, T value)
+        requires copyable<T>
+        {
+            return insert_at(next(position),value);
+        }
+
         auto insert_at (size_t index, T value) requires copyable<T>
         {
             auto new_count = max(count_,index) + 1;
@@ -146,22 +153,10 @@ namespace br::dev::pedrolamarao::structures
             return segment_list_position<T>(root_.base+index);
         }
 
-        void insert_at (position_type position, T value)
+        auto insert_at (position_type position, T value)
         {
             size_t index = position.current - root_.base;
-            insert_at(index,value);
-        }
-
-        // requires: index <= count
-        auto store (size_t index, T value)
-        {
-            return root_.base[index] = value;
-        }
-
-        // requires: ?
-        void store (segment_list_position<T> position, T value)
-        {
-            *(position.current) = value;
+            return insert_at(index,value);
         }
 
     private:
