@@ -10,7 +10,13 @@ using namespace std;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// Linear structure with access to the top.
+    /// Linear composite structure with access to the top.
+    ///
+    /// Composite structures are made of parts with unique positions.
+    ///
+    /// Linear structures are composed of positions with a single predecessor and successor.
+    ///
+    /// Stacks allow access only at the last position, called the top.
     export
     template <typename Structure>
     concept stack = requires (Structure structure)
