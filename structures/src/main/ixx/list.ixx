@@ -14,9 +14,8 @@ namespace br::dev::pedrolamarao::structures
     ///
     /// Composite structures are made of parts with unique positions.
     ///
-    /// Linear structures are composed of positions with a single predecessor and successor.
-    ///
-    /// Lists allow accessing positions in "random" order.
+    /// Linear structures' parts are like points in a line,
+    /// each position having a single predecessor and a single successor.
     export
     template <typename Structure>
     concept list = requires (Structure structure)
@@ -38,6 +37,11 @@ namespace br::dev::pedrolamarao::structures
         { structure.first() } -> same_as< typename Structure::position_type >;
 
         { structure.after_last() } -> same_as< typename Structure::position_type >;
+
+        requires requires (typename Structure::position_type p1, typename Structure::position_type p2)
+        {
+            { ( next(p1) == next(p2) ) == ( p1 == p2 ) };
+        };
 
         requires requires (typename Structure::position_type position, typename Structure::value_type value)
         {

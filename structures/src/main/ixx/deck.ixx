@@ -14,9 +14,11 @@ namespace br::dev::pedrolamarao::structures
     ///
     /// Composite structures are made of parts with unique positions.
     ///
-    /// Linear structures are composed of positions with a single predecessor and successor.
+    /// Linear structures' parts are like points in a line,
+    /// each position having a single predecessor and a single successor.
     ///
-    /// Decks allow access only at the first position and the last position, respectively called bottom and top.
+    /// Decks allow access at the first and the last positions,
+    /// respectively called the bottom and the top.
     export
     template <typename Structure>
     concept deck = requires (Structure structure)

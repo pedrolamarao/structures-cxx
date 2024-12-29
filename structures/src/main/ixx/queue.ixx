@@ -14,9 +14,10 @@ namespace br::dev::pedrolamarao::structures
     ///
     /// Composite structures are made of parts with unique positions.
     ///
-    /// Linear structures are composed of positions with a single predecessor and successor.
+    /// Linear structures' parts are like points in a line,
+    /// each position having a single predecessor and a single successor.
     ///
-    /// Queues allow inserting only at the first position and loading or erasing at the last position,
+    /// Queues allow inserting at the first and removing at the last position,
     /// respectively called the back and the front.
     export
     template <typename Structure>
