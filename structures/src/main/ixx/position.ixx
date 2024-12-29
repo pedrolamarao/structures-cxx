@@ -8,19 +8,28 @@ using namespace std;
 
 namespace br::dev::pedrolamarao::structures
 {
+    template <typename Type>
+    concept referenceable = requires (Type type)
+    {
+        { static_cast<Type &>(type) };
+    };
+
     /// Structural position.
     export
     template <typename Position>
     concept position = requires (Position position)
     {
-        typename Position::value_type;
-
         { is_equal(position,position) } -> convertible_to<bool>;
 
         { not_equal(position,position) } -> convertible_to<bool>;
 
-        { load(position) } -> convertible_to<typename Position::value_type>;
+        { load(position) } -> referenceable;
     };
+
+    /// Value type stored in a position.
+    export
+    template <position P>
+    using stored_type_of = decltype( load(P()) );
 
     export
     template <position P>
