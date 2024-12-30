@@ -9,15 +9,6 @@ namespace br::dev::pedrolamarao::structures
     template <typename T>
     class uninode_list_position
     {
-        template <typename>
-        friend class uninode_list_v1;
-
-        template <typename>
-        friend class uninode_list_v2;
-
-        template <typename>
-        friend class uninode_list_v3;
-
         uninode<T> * node;
 
     public:
@@ -50,6 +41,18 @@ namespace br::dev::pedrolamarao::structures
         {
             return uninode_list_position(node->link);
         }
+
+        template <typename>
+        friend class uninode_hoop;
+
+        template <typename>
+        friend class uninode_list_v1;
+
+        template <typename>
+        friend class uninode_list_v2;
+
+        template <typename>
+        friend class uninode_list_v3;
     };
 
     export
