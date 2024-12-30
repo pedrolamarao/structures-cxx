@@ -60,8 +60,8 @@ namespace br::dev::pedrolamarao::structures
             head_ { that.head_ }
         {
             that.head_ = new binode<T>;
-            that.head_->left = head_;
-            that.head_->right = head_;
+            that.head_->left = that.head_;
+            that.head_->right = that.head_;
         }
 
         /// Moves that list into this list.
