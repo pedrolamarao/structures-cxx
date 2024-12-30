@@ -10,19 +10,22 @@ using std::copyable;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// Linear sequence with access at "top"
-    /// projected onto uni-linked memory nodes.
+    /// Stack projected onto a uni-linked memory chain.
     ///
-    /// Nodes link towards bottom.
-    /// The root node links to the top node
-    /// and bottom node links to nowhere.
+    /// Nodes link from top to bottom.
+    ///
+    /// The stack links to the top node.
+    ///
+    /// The bottom node links to nullptr.
     export
     template <typename T>
     class uninode_stack
     {
-        uninode<T> * root_;
+        uninode<T> * top_;
 
-        explicit uninode_stack (uninode<T> * r) noexcept : root_{r} {}
+        explicit uninode_stack (uninode<T>* top) noexcept :
+            top_{top}
+        {}
 
     public:
 
@@ -32,25 +35,21 @@ namespace br::dev::pedrolamarao::structures
 
         /// Constructs an empty stack.
         uninode_stack () noexcept :
-            root_{}
-        {
-            root_ = new uninode<T>;
-            root_->link = root_;
-        }
+            top_{}
+        {}
 
         /// Moves that stack into this stack.
         uninode_stack (uninode_stack && that) noexcept :
-            root_{that.root_}
+            top_ { that.top_ }
         {
-            that.root_ = new uninode<T>;
-            that.root_->link = that.root_;
+            that.top_ = {};
         }
 
         /// Moves that stack into this stack.
-        auto operator= (uninode_stack && that) noexcept
+        auto& operator= (uninode_stack && that) noexcept
         {
             using std::swap;
-            swap(root_,that.root_);
+            swap(top_,that.top_);
             return *this;
         }
 
@@ -61,53 +60,52 @@ namespace br::dev::pedrolamarao::structures
         /// Destructs this stack.
         ~uninode_stack ()
         {
-            auto node = root_->link;
-            while (node != root_) {
-                auto next = node->link;
-                delete node;
-                node = next;
+            while (top_ != nullptr) {
+                auto next = top_->link;
+                delete top_;
+                top_ = next;
             }
-            delete root_;
         }
 
-        // query
+        // properties
 
         auto is_empty () const
         {
-            return root_->link == root_;
+            return top_ == nullptr;
         }
 
         auto not_empty () const
         {
-            return root_->link != root_;
+            return top_ != nullptr;
         }
+
+        // elements
 
         /// Top of the stack.
         ///
         /// Requires: not_empty
         auto top () -> value_type
         {
-            return root_->link->content;
+            return top_->content;
         }
 
         // update
+
+        /// Inserts into the stack.
+        void insert (T value) requires copyable<T>
+        {
+            auto inserted = new uninode<T>(top_,value);
+            top_ = inserted;
+        }
 
         /// Erases from the stack.
         ///
         /// Requires: not_empty
         void erase ()
         {
-            auto target = root_->link;
-            auto next = target->link;
-            root_->link = next;
-            delete target;
-        }
-
-        /// Inserts into the stack.
-        void insert (T value) requires copyable<T>
-        {
-            auto inserted = new uninode<T>(root_->link,value);
-            root_->link = inserted;
+            auto erased = top_;
+            top_ = erased->link;
+            delete erased;
         }
     };
 }
