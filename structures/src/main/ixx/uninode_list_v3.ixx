@@ -104,7 +104,7 @@ namespace br::dev::pedrolamarao::structures
                 --count;
             }
             current->link = head;
-            return uninode_list<TT>(head);
+            return uninode_list_v3<TT>(head);
         }
 
         // properties
