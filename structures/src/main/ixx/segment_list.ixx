@@ -120,25 +120,14 @@ namespace br::dev::pedrolamarao::structures
 
         // update
 
-        void erase_after (position_type position)
+        auto insert_first (value_type value)
         {
-            erase_at(next(position));
-        }
-
-        void erase_at (size_t index)
-        {
-            shift_left(root_,index,count_);
-            --count_;
-        }
-
-        void erase_at (position_type position)
-        {
-            size_t index = position.current - root_.base;
-            erase_at(index);
+            return insert_at(first(),value);
         }
 
         auto insert_after (position_type position, T value)
         requires copyable<T>
+        // requires is_reachable(first(),position)
         {
             return insert_at(next(position),value);
         }
@@ -154,9 +143,36 @@ namespace br::dev::pedrolamarao::structures
         }
 
         auto insert_at (position_type position, T value)
+        // requires is_reachable(first(),position)
         {
             size_t index = position.current - root_.base;
             return insert_at(index,value);
+        }
+
+        void remove_first ()
+        // requires not_empty()
+        {
+            shift_left(root_,0,count_);
+            --count_;
+        }
+
+        void remove_after (position_type position)
+        // requires is_reachable(first(),position)
+        {
+            remove_at(next(position));
+        }
+
+        void remove_at (size_t index)
+        {
+            shift_left(root_,index,count_);
+            --count_;
+        }
+
+        void remove_at (position_type position)
+        // is_reachable(first(),position)
+        {
+            size_t index = position.current - root_.base;
+            remove_at(index);
         }
 
     private:

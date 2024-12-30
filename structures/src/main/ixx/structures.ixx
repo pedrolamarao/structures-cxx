@@ -1,7 +1,3 @@
-module;
-
-#include <concepts>
-
 export module br.dev.pedrolamarao.structures;
 
 export import :position;
@@ -27,11 +23,11 @@ export import :segment_stack;
 
 export import :uninode;
 export import :uninode_hoop;
-export import :uninode_list;
+export import :uninode_list_v1;
+export import :uninode_list_v2;
+export import :uninode_list_v3;
 export import :uninode_list_position;
 export import :uninode_stack;
-
-using namespace std;
 
 namespace br::dev::pedrolamarao::structures
 {

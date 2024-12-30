@@ -10,17 +10,25 @@ namespace br::dev::pedrolamarao::structures
     class uninode_list_position
     {
         template <typename>
-        friend class uninode_list;
+        friend class uninode_list_v1;
+
+        template <typename>
+        friend class uninode_list_v2;
+
+        template <typename>
+        friend class uninode_list_v3;
 
         uninode<T> * node;
-
-        explicit uninode_list_position (uninode<T> * p) : node{p} {}
 
     public:
 
         using value_type = T;
 
         uninode_list_position () = delete;
+
+        explicit uninode_list_position (uninode<T> * n) noexcept :
+            node{n}
+        {}
 
         auto is_equal (uninode_list_position that)
         {

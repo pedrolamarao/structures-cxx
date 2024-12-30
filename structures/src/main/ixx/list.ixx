@@ -32,22 +32,19 @@ namespace br::dev::pedrolamarao::structures
 
         requires same_as< typename Structure::value_type, typename Structure::position_type::value_type >;
 
-        { structure.before_first() } -> same_as< typename Structure::position_type >;
-
         { structure.first() } -> same_as< typename Structure::position_type >;
 
         { structure.after_last() } -> same_as< typename Structure::position_type >;
 
-        requires requires (typename Structure::position_type p1, typename Structure::position_type p2)
-        {
-            { ( next(p1) == next(p2) ) == ( p1 == p2 ) };
-        };
-
         requires requires (typename Structure::position_type position, typename Structure::value_type value)
         {
-            { structure.erase_after(position) };
+            { structure.insert_first(value) } -> same_as< typename Structure::position_type >;
 
             { structure.insert_after(position,value) } -> same_as< typename Structure::position_type >;
+
+            { structure.remove_first() };
+
+            { structure.remove_after(position) };
         };
     };
 }

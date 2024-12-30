@@ -51,7 +51,7 @@ namespace br::dev::pedrolamarao::structures
         }
 
         /// Moves that list into this list.
-        auto operator= (binode_list && that)
+        auto& operator= (binode_list && that) noexcept
         {
             using std::swap;
             swap(this->root_,that.root_);
@@ -97,13 +97,19 @@ namespace br::dev::pedrolamarao::structures
             return binode_list<TT>(root);
         }
 
-        // query
+        // properties
 
-        /// Position after the last element.
-        auto after_last ()
+        auto is_empty () const
         {
-            return binode_list_position<T>(root_);
+            return root_->right == root_;
         }
+
+        auto not_empty () const
+        {
+            return root_->right != root_;
+        }
+
+        // positions
 
         /// Position before the first element.
         auto before_first ()
@@ -117,61 +123,60 @@ namespace br::dev::pedrolamarao::structures
             return binode_list_position<T>(root_->right);
         }
 
-        auto is_empty () const
+        /// Position of the last element.
+        auto last ()
         {
-            return root_->right == root_;
+            return binode_list_position<T>(root_->left);
         }
 
-        auto not_empty () const
+        /// Position after the last element.
+        auto after_last ()
         {
-            return root_->right != root_;
+            return binode_list_position<T>(root_);
         }
 
         // update
 
-        void erase_after (position_type position)
-        {
-            auto node = position.node;
-            auto target = node->right;
-            link(node,target->right);
-            delete target;
-        }
-
-        /// Erases element at position.
-        ///
-        /// Requires: first <= position < limit
-        auto erase_at (position_type position)
-        {
-            auto target = position.node;
-            auto previous = target->left;
-            auto next = target->right;
-            link(previous,next);
-            delete target;
-        }
-
-        auto insert_after (position_type position, T value) -> position_type
+        auto insert_first (T value)
         requires copyable<T>
         {
-            auto inserted = new binode<T>;
-            inserted->content = value;
+            auto inserted = new binode<T>(root_,root_->right,value);
+            root_->right = inserted;
+            return binode_list_position<T>(inserted);
+        }
+
+        auto insert_after (binode_list_position<T> position, T value)
+        requires copyable<T>
+        // requires is_reachable(first(),position)
+        {
             auto previous = position.node;
             auto next = previous->right;
-            link(previous,inserted);
-            link(inserted,next);
-            return position_type(inserted);
+            auto inserted = new binode<T>(previous,next,value);
+            previous->right = inserted;
+            next->left = inserted;
+            return binode_list_position<T>(inserted);
         }
 
-        /// Inserts element at position.
-        auto insert_at (binode_list_position<T> position, T value)
-        requires copyable<T>
+        auto remove_first ()
+        // requires not_empty()
         {
-            auto next = position.node;
-            auto previous = next->left;
-            auto inserted = new binode<T>;
-            link(previous,inserted);
-            link(inserted,next);
-            inserted->content = value;
-            return binode_list_position<T>(inserted);
+            auto erased = root_->right;
+            auto next = erased->right;
+            root_->right = next;
+            next->left = root_;
+            delete erased;
+        }
+
+        auto remove_after (position_type position)
+        // requires is_reachable(first(),position)
+        {
+            auto previous = position.node;
+            auto erased = previous->right;
+            if (erased == nullptr) return;
+            auto next = erased->right;
+            previous->right = next;
+            next->left = previous;
+            delete erased;
         }
     };
 }

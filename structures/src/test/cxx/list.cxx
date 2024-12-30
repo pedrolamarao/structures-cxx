@@ -23,54 +23,56 @@ struct list_test : testing::Test
 using types = testing::Types<
     binode_list<thing>,
     segment_list<thing>,
-    uninode_list<thing>
+    uninode_list_v1<thing>,
+    uninode_list_v2<thing>,
+    uninode_list_v3<thing>
 >;
 
 TYPED_TEST_SUITE(list_test,types);
 
-TYPED_TEST(list_test,default_insert_erase_first)
+TYPED_TEST(list_test,default_insert_remove_first)
 {
     TypeParam list;
     ASSERT_TRUE(list.is_empty());
     ASSERT_EQ(list.first(),list.after_last());
 
-    list.insert_after(list.before_first(),thing::one);
+    list.insert_first(thing::one);
     ASSERT_TRUE(list.not_empty());
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::one);
 
-    list.insert_after(list.before_first(),thing::two);
+    list.insert_first(thing::two);
     ASSERT_TRUE(list.not_empty());
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::two);
 
-    list.insert_after(list.before_first(),thing::forty_nine);
+    list.insert_first(thing::forty_nine);
     ASSERT_TRUE(list.not_empty());
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::forty_nine);
 
-    list.erase_after(list.before_first());
+    list.remove_first();
     ASSERT_TRUE(list.not_empty());
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::two);
 
-    list.erase_after(list.before_first());
+    list.remove_first();
     ASSERT_TRUE(list.not_empty() );
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::one);
 
-    list.erase_after(list.before_first());
+    list.remove_first();
     ASSERT_TRUE(list.is_empty());
     ASSERT_EQ(list.first(),list.after_last());
 }
 
-TYPED_TEST(list_test,default_insert_last_erase_first)
+TYPED_TEST(list_test,default_insert_last_remove_first)
 {
     TypeParam list;
     ASSERT_TRUE(list.is_empty());
     ASSERT_EQ(list.first(),list.after_last());
 
-    auto last = list.insert_after(list.before_first(),thing::one);
+    auto last = list.insert_first(thing::one);
     ASSERT_TRUE(list.not_empty());
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::one);
@@ -85,28 +87,28 @@ TYPED_TEST(list_test,default_insert_last_erase_first)
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::one);
 
-    list.erase_after(list.before_first());
+    list.remove_first();
     ASSERT_TRUE(list.not_empty());
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::two);
 
-    list.erase_after(list.before_first());
+    list.remove_first();
     ASSERT_TRUE(list.not_empty() );
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::forty_nine);
 
-    list.erase_after(list.before_first());
+    list.remove_first();
     ASSERT_TRUE(list.is_empty());
     ASSERT_EQ(list.first(),list.after_last());
 }
 
-TYPED_TEST(list_test,default_insert_erase_last)
+TYPED_TEST(list_test,default_insert_remove_last)
 {
     TypeParam list;
     ASSERT_TRUE(list.is_empty());
     ASSERT_EQ(list.first(),list.after_last());
 
-    auto last = list.insert_after(list.before_first(),thing::one);
+    auto last = list.insert_first(thing::one);
     ASSERT_TRUE(list.not_empty());
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::one);
@@ -121,17 +123,17 @@ TYPED_TEST(list_test,default_insert_erase_last)
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::one);
 
-    list.erase_after(next(list.first()));
+    list.remove_after(next(list.first()));
     ASSERT_TRUE(list.not_empty());
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::one);
 
-    list.erase_after(list.first());
+    list.remove_after(list.first());
     ASSERT_TRUE(list.not_empty() );
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::one);
 
-    list.erase_after(list.before_first());
+    list.remove_first();
     ASSERT_TRUE(list.is_empty());
     ASSERT_EQ(list.first(),list.after_last());
 }
