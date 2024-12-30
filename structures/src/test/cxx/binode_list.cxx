@@ -16,7 +16,7 @@ enum class thing
 
 TEST(binode_list_test,filled)
 {
-    auto filled = binode_list<thing>::filled(thing::forty_nine,49);
+    auto filled = binode_list_v3<thing>::filled(thing::forty_nine,49);
     ASSERT_FALSE( filled.is_empty() );
 
     auto moved = std::move(filled);

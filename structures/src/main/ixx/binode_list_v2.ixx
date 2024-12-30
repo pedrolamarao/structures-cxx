@@ -2,7 +2,7 @@ module;
 
 #include <concepts>
 
-export module br.dev.pedrolamarao.structures:binode_list;
+export module br.dev.pedrolamarao.structures:binode_list_v2;
 
 import :binode;
 import :binode_list_position;
@@ -11,19 +11,31 @@ using std::copyable;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// Linear sequence projected onto bi-linked memory nodes.
+    /// List projected onto a bi-linked memory chain.
     ///
     /// Nodes link left towards first and right towards last.
-    /// The root node links right with the first node
-    /// and links left with the last node.
+    ///
+    /// There is a head node, embedded in the list,
+    /// linking left to the last node and right to the first node.
+    ///
+    /// The last node links to nullptr.
+    ///
+    /// Advantages of this implementation:
+    /// - empty list requires no "remote" storage
+    /// - noexcept default and move initialization
+    /// - before_first and last positions are available
+    ///
+    /// Disadvantages of this implementation:
+    /// - list object contains head with unused space
+    /// - insert_first, insert_after, remove_first and remove_after are slowed by nullptr guards
     export
     template <typename T>
-    class binode_list
+    class binode_list_v2
     {
-        binode<T>* root_;
+        binode<T> head_;
 
-        explicit binode_list (binode<T>* root) noexcept :
-            root_{root}
+        explicit binode_list_v2 (binode<T>* first, binode<T>* last) noexcept :
+            head_ { .left = last, .right = first }
         { }
 
     public:
@@ -35,43 +47,38 @@ namespace br::dev::pedrolamarao::structures
         // type
 
         /// Constructs an empty list.
-        binode_list () :
-            root_ {}
+        binode_list_v2 () noexcept :
+            head_ {}
+        {}
+
+        /// Moves that list into this list.
+        binode_list_v2 (binode_list_v2 && that) noexcept :
+            head_ { that.head_ }
         {
-            root_ = new binode<T>;
-            link(root_,root_);
+            that.head_ = {};
         }
 
         /// Moves that list into this list.
-        binode_list (binode_list && that) :
-            root_{that.root_}
-        {
-            that.root_ = new binode<T>;
-            link(that.root_,that.root_);
-        }
-
-        /// Moves that list into this list.
-        auto& operator= (binode_list && that) noexcept
+        auto& operator= (binode_list_v2 && that) noexcept
         {
             using std::swap;
-            swap(this->root_,that.root_);
+            swap(this->head_,that.head_);
             return *this;
         }
 
-        binode_list (binode_list const & that) = delete;
+        binode_list_v2 (binode_list_v2 const & that) = delete;
 
-        auto operator= (binode_list const & that) = delete;
+        auto operator= (binode_list_v2 const & that) = delete;
 
         /// Destructs this list.
-        ~binode_list ()
+        ~binode_list_v2 ()
         {
-            auto node = root_->right;
-            while (node != root_) {
+            auto node = head_.right;
+            while (node != nullptr) {
                 auto next = node->right;
                 delete node;
                 node = next;
             }
-            delete root_;
         }
 
         // factories
@@ -80,33 +87,36 @@ namespace br::dev::pedrolamarao::structures
         ///
         /// Provides: distance(first,limit) == count
         template <typename TT>
-        requires copyable<TT>
         static
         auto filled (TT value, size_t count)
+        requires copyable<TT>
         {
-            auto root = new binode<TT>;
-            auto current = root;
+            if (count == 0)
+                return binode_list_v2<TT>();
+            auto first = new binode<TT>;
+            first->value = value;
+            auto current = first;
             while (count > 0) {
                 auto next = new binode<TT>;
-                link(current,next);
                 next->content = value;
+                next->left = current;
+                current->right = next;
                 current = next;
                 --count;
             }
-            link(current,root);
-            return binode_list<TT>(root);
+            return binode_list_v2<TT>(first,current);
         }
 
         // properties
 
         auto is_empty () const
         {
-            return root_->right == root_;
+            return head_.right == nullptr;
         }
 
         auto not_empty () const
         {
-            return root_->right != root_;
+            return head_.right != nullptr;
         }
 
         // positions
@@ -114,25 +124,25 @@ namespace br::dev::pedrolamarao::structures
         /// Position before the first element.
         auto before_first ()
         {
-            return binode_list_position<T>(root_);
+            return binode_list_position<T>(&head_);
         }
 
         /// Position of the first element.
         auto first ()
         {
-            return binode_list_position<T>(root_->right);
+            return binode_list_position<T>(head_.right);
         }
 
         /// Position of the last element.
         auto last ()
         {
-            return binode_list_position<T>(root_->left);
+            return binode_list_position<T>(head_.left);
         }
 
         /// Position after the last element.
         auto after_last ()
         {
-            return binode_list_position<T>(root_);
+            return binode_list_position<T>(nullptr);
         }
 
         // update
@@ -140,8 +150,8 @@ namespace br::dev::pedrolamarao::structures
         auto insert_first (T value)
         requires copyable<T>
         {
-            auto inserted = new binode<T>(root_,root_->right,value);
-            root_->right = inserted;
+            auto inserted = new binode<T>(&head_,head_.right,value);
+            head_.right = inserted;
             return binode_list_position<T>(inserted);
         }
 
@@ -153,17 +163,17 @@ namespace br::dev::pedrolamarao::structures
             auto next = previous->right;
             auto inserted = new binode<T>(previous,next,value);
             previous->right = inserted;
-            next->left = inserted;
+            if (next != nullptr) next->left = inserted;
             return binode_list_position<T>(inserted);
         }
 
         auto remove_first ()
         // requires not_empty()
         {
-            auto erased = root_->right;
+            auto erased = head_.right;
             auto next = erased->right;
-            root_->right = next;
-            next->left = root_;
+            head_.right = next;
+            if (next != nullptr) next->left = &head_;
             delete erased;
         }
 
@@ -175,7 +185,7 @@ namespace br::dev::pedrolamarao::structures
             if (erased == nullptr) return;
             auto next = erased->right;
             previous->right = next;
-            next->left = previous;
+            if (next != nullptr) next->left = previous;
             delete erased;
         }
     };

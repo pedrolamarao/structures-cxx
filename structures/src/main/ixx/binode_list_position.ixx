@@ -9,9 +9,6 @@ namespace br::dev::pedrolamarao::structures
     template <typename T>
     class binode_list_position
     {
-        template <typename>
-        friend class binode_list;
-
         binode<T> * node;
 
         explicit binode_list_position (binode<T> * p) : node{p} {}
@@ -52,6 +49,15 @@ namespace br::dev::pedrolamarao::structures
         {
             return binode_list_position(node->left);
         }
+
+        template <typename>
+        friend class binode_list_v1;
+
+        template <typename>
+        friend class binode_list_v2;
+
+        template <typename>
+        friend class binode_list_v3;
     };
 
     export

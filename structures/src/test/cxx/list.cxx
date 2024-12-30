@@ -21,7 +21,9 @@ struct list_test : testing::Test
 };
 
 using types = testing::Types<
-    binode_list<thing>,
+    binode_list_v1<thing>,
+    binode_list_v2<thing>,
+    binode_list_v3<thing>,
     segment_list<thing>,
     uninode_list_v1<thing>,
     uninode_list_v2<thing>,
