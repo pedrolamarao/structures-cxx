@@ -34,7 +34,7 @@ namespace br::dev::pedrolamarao::structures
 
         using value_type = T;
 
-        using position_type = segment_list_position<T>;
+        using position_type = segment_linear_position<T>;
 
         // type
 
@@ -93,19 +93,19 @@ namespace br::dev::pedrolamarao::structures
         /// Position after the last element.
         auto after_last ()
         {
-            return segment_list_position<T>(root_.base + count_);
+            return segment_linear_position<T>(root_.base + count_);
         }
 
         /// Position before the first element.
         auto before_first ()
         {
-            return segment_list_position<T>(root_.base - 1);
+            return segment_linear_position<T>(root_.base - 1);
         }
 
         /// Position of the first element.
         auto first ()
         {
-            return segment_list_position<T>(root_.base);
+            return segment_linear_position<T>(root_.base);
         }
 
         auto is_empty () const
@@ -139,13 +139,13 @@ namespace br::dev::pedrolamarao::structures
             shift_right(index);
             root_.base[index] = value;
             count_ = new_count;
-            return segment_list_position<T>(root_.base+index);
+            return segment_linear_position<T>(root_.base+index);
         }
 
         auto insert_at (position_type position, T value)
         // requires is_reachable(first(),position)
         {
-            size_t index = position.current - root_.base;
+            size_t index = position.position_ - root_.base;
             return insert_at(index,value);
         }
 
@@ -171,7 +171,7 @@ namespace br::dev::pedrolamarao::structures
         void remove_at (position_type position)
         // is_reachable(first(),position)
         {
-            size_t index = position.current - root_.base;
+            size_t index = position.position_ - root_.base;
             remove_at(index);
         }
 
