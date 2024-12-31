@@ -92,11 +92,11 @@ namespace br::dev::pedrolamarao::structures
             if (count == 0)
                 return uninode_list_v2<TT>();
             auto first = new uninode<T>;
-            first->value = value;
+            first->content = value;
             auto current = first;
             while (--count > 0) {
                 auto next = new uninode<TT>;
-                next->value = value;
+                next->content = value;
                 current->link = next;
                 current = next;
             }

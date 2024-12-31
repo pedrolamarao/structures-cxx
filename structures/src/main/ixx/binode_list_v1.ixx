@@ -41,7 +41,7 @@ namespace br::dev::pedrolamarao::structures
 
         using value_type = T;
 
-        using position_type = binode_list_position<T>;
+        using position_type = binode_linear_position<T>;
 
         // type
 
@@ -90,9 +90,9 @@ namespace br::dev::pedrolamarao::structures
         auto filled (TT value, size_t count)
         {
             if (count == 0)
-                return binode_list_v2<TT>();
+                return binode_list_v1<TT>();
             auto first = new binode<TT>;
-            first->value = value;
+            first->content = value;
             auto current = first;
             while (count > 0) {
                 auto next = new binode<TT>;
@@ -122,13 +122,13 @@ namespace br::dev::pedrolamarao::structures
         /// Position of the first element.
         auto first ()
         {
-            return binode_list_position<T>(first_);
+            return binode_linear_position<T>(first_);
         }
 
         /// Position after the last element.
         auto after_last ()
         {
-            return binode_list_position<T>(nullptr);
+            return binode_linear_position<T>(nullptr);
         }
 
         // update
@@ -139,10 +139,10 @@ namespace br::dev::pedrolamarao::structures
             auto inserted = new binode<T>(nullptr,first_,value);
             if (first_ != nullptr) first_->left = inserted;
             first_ = inserted;
-            return binode_list_position<T>(inserted);
+            return binode_linear_position<T>(inserted);
         }
 
-        auto insert_after (binode_list_position<T> position, T value)
+        auto insert_after (binode_linear_position<T> position, T value)
         requires copyable<T>
         // requires is_reachable(first(),position)
         {
@@ -151,7 +151,7 @@ namespace br::dev::pedrolamarao::structures
             auto inserted = new binode<T>(previous,next,value);
             if (next != nullptr) next->left = inserted;
             previous->right = inserted;
-            return binode_list_position<T>(inserted);
+            return binode_linear_position<T>(inserted);
         }
 
         auto remove_first ()
