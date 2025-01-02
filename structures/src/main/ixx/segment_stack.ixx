@@ -10,6 +10,7 @@ import :segment;
 using std::copyable;
 using std::default_initializable;
 using std::max;
+using std::size_t;
 
 namespace br::dev::pedrolamarao::structures
 {

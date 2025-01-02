@@ -8,6 +8,7 @@ import :binode;
 import :binode_list_position;
 
 using std::copyable;
+using std::size_t;
 
 namespace br::dev::pedrolamarao::structures
 {
