@@ -7,6 +7,7 @@ export module br.dev.pedrolamarao.structures:binode_deck;
 import :binode;
 
 using std::copyable;
+using std::size_t;
 
 namespace br::dev::pedrolamarao::structures
 {
