@@ -9,7 +9,7 @@ using std::movable;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// Contiguous memory positions implicitly related by "offset".
+    /// Memory segments are sequences of memory cells identified by memory addresses.
     export
     template <typename T>
     struct segment
@@ -18,29 +18,29 @@ namespace br::dev::pedrolamarao::structures
         size_t length {};
     };
 
-    /// Shift memory segment "words" one position to the left.
+    /// Shifts memory cells one position to the left.
     ///
-    /// The leftmost "word" is lost.
-    ///
-    /// Requires: 0 < first < limit <= segment.length
+    /// The content of the leftmost cell is destroyed.
     export
     template <typename T>
-    void shift_left (segment<T>& segment, size_t first, size_t limit) requires copyable<T>
+    void shift_left (segment<T>& segment, size_t first, size_t limit)
+    requires copyable<T>
+    // requires: 0 < first <= limit <= segment.length
     {
-        for (auto i = first, j = first+1; j != limit; ++i, ++j)
+        for (auto i = first, j = first+1; j < limit; ++i, ++j)
             segment.base[i] = segment.base[j];
     }
 
-    /// Shift memory segment "words" one position to the right.
+    /// Shifts memory cells one position to the right.
     ///
-    /// The rightmost "word" is lost.
-    ///
-    /// Requires: 0 <= first < limit < segment.length
+    /// The content of the rightmost cell is destroyed.
     export
     template <typename T>
-    void shift_right (segment<T>& segment, size_t first, size_t limit) requires copyable<T>
+    void shift_right (segment<T>& segment, size_t first, size_t limit)
+    requires copyable<T>
+    // requires: 0 <= first << limit < segment.length
     {
-        for (auto i = limit; i != first; --i)
-            segment.base[i] = segment.base[i-1];
+        for (auto i = limit, j = limit - 1; i > first; --i, --j)
+            segment.base[i] = segment.base[j];
     }
 }
