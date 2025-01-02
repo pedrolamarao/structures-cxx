@@ -16,10 +16,10 @@ namespace br::dev::pedrolamarao::structures
 {
     /// List projected onto a memory segment.
     ///
-    /// List positions are memory "words".
+    /// List positions correspond to memory cells.
     ///
-    /// Unused storage is maintained at right.
-    /// Compacting shifts towards left.
+    /// Elements are strictly aligned at the left,
+    /// leaving empty storage at the right.
     ///
     /// Advantages of this implementation:
     /// - minimal list object

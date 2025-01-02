@@ -26,6 +26,7 @@ using types = testing::Types<
     binode_list_v3<thing>,
     segment_list_v1<thing>,
     segment_list_v2<thing>,
+    segment_list_v3<thing>,
     uninode_list_v1<thing>,
     uninode_list_v2<thing>,
     uninode_list_v3<thing>

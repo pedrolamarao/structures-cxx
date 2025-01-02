@@ -58,6 +58,9 @@ namespace br::dev::pedrolamarao::structures
 
         template <typename>
         friend class segment_list_v2;
+
+        template <typename>
+        friend class segment_list_v3;
     };
 
     export

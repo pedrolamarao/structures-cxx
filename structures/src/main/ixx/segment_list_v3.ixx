@@ -3,7 +3,7 @@ module;
 #include <algorithm>
 #include <concepts>
 
-export module br.dev.pedrolamarao.structures:segment_list_v2;
+export module br.dev.pedrolamarao.structures:segment_list_v3;
 
 import :segment;
 import :segment_list_position;
@@ -18,11 +18,11 @@ namespace br::dev::pedrolamarao::structures
     ///
     /// List positions correspond to memory cells.
     ///
-    /// Elements are not aligned to any extremity,
+    /// Elements are allowed to flow to the middle,
     /// leaving empty storage at left and right.
     ///
     /// When inserting in the middle,
-    /// elements shift to the right;
+    /// elements shift towards the largest empty storage;
     /// conversely when erasing.
     ///
     /// Advantages of this implementation:
@@ -31,9 +31,10 @@ namespace br::dev::pedrolamarao::structures
     /// Disadvantages of this implementation:
     /// - list object requires additional storage
     /// - insert_after and remove_after require an additional test for first position
+    /// - insert_after and remove_after require an additional test for largest empty storage
     export
     template <typename T>
-    class segment_list_v2
+    class segment_list_v3
     {
         segment<T> segment_;
 
@@ -41,7 +42,7 @@ namespace br::dev::pedrolamarao::structures
 
         size_t     count_;
 
-        explicit segment_list_v2 (segment<T> segment, size_t first, size_t count) noexcept :
+        explicit segment_list_v3 (segment<T> segment, size_t first, size_t count) noexcept :
             segment_ { segment }, first_ { first }, count_ { count }
         { }
 
@@ -54,12 +55,12 @@ namespace br::dev::pedrolamarao::structures
         // type
 
         /// Constructs an empty list.
-        segment_list_v2 () noexcept :
-            segment_list_v2({},{},{})
+        segment_list_v3 () noexcept :
+            segment_list_v3({},{},{})
         { }
 
         /// Moves that list into this list.
-        segment_list_v2 (segment_list_v2 && that) noexcept :
+        segment_list_v3 (segment_list_v3 && that) noexcept :
             segment_ { that.segment_ }, first_ { that.first_ }, count_ { that.count_ }
         {
             that.segment_ = {};
@@ -68,7 +69,7 @@ namespace br::dev::pedrolamarao::structures
         }
 
         /// Moves that list into this list.
-        auto operator= (segment_list_v2 && that) noexcept -> segment_list_v2&
+        auto operator= (segment_list_v3 && that) noexcept -> segment_list_v3&
         {
             using std::swap;
             swap(segment_,that.segment_);
@@ -77,12 +78,12 @@ namespace br::dev::pedrolamarao::structures
             return *this;
         }
 
-        segment_list_v2 (segment_list_v2 const & that) = delete;
+        segment_list_v3 (segment_list_v3 const & that) = delete;
 
-        auto operator= (segment_list_v2 const & that) = delete;
+        auto operator= (segment_list_v3 const & that) = delete;
 
         /// Destructs this list.
-        ~segment_list_v2 ()
+        ~segment_list_v3 ()
         {
             delete [] segment_.base;
         }
@@ -101,7 +102,7 @@ namespace br::dev::pedrolamarao::structures
             for (auto i = 0; i != count; ++i)
                 memory_[i] = value;
             auto segment_ = segment<TT>(memory_,count);
-            return segment_list_v2<TT>(segment_,0,count);
+            return segment_list_v3<TT>(segment_,0,count);
         }
 
         // properties
@@ -188,7 +189,7 @@ namespace br::dev::pedrolamarao::structures
                 if (count_ < segment_.length - first_)
                 {
                 }
-                // no space at right
+                // no space at left
                 else
                 {
                     expand_right(index);
@@ -197,12 +198,18 @@ namespace br::dev::pedrolamarao::structures
             // insert at middle
             else
             {
-                // has space at right?
-                if (count_ < segment_.length - first_)
+                // has space somewhere?
+                if (count_ < segment_.length)
                 {
-                    shift_right(index);
+                    auto left_space = first_;
+                    auto right_space = segment_.length - first_ - count_;
+                    // has more space at right?
+                    if (left_space < right_space)
+                        shift_right(index);
+                    else
+                        shift_left(index);
                 }
-                // no space at right
+                // no space anywhere
                 else
                 {
                     expand_right(index);
@@ -236,12 +243,20 @@ namespace br::dev::pedrolamarao::structures
         void remove_at (size_t index)
         // requires index < count_
         {
-            // erase at left?
-            if (index == 0)
+            // is first?
+            if (index == 0) {
                 ++first_;
-            // erase at middle or right
-            else
-                shift_left(index);
+            }
+            // is not last?
+            else if (index != count_ - 1) {
+                auto left_space = first_;
+                auto right_space = segment_.length - first_ - count_;
+                // has more space at right?
+                if (left_space < right_space)
+                    shift_left(index);
+                else
+                    shift_right(index);
+            }
             --count_;
         }
 
@@ -264,13 +279,13 @@ namespace br::dev::pedrolamarao::structures
             segment_.length = length;
         }
 
-        // requires: index <= count_
+        // requires: index < count_
         void shift_left (size_t index)
         {
             structures::shift_left(segment_,first_ + index,count_);
         }
 
-        // requires: index <= count_
+        // requires: index < count_
         void shift_right (size_t index)
         {
             structures::shift_right(segment_,first_ + index,count_);
