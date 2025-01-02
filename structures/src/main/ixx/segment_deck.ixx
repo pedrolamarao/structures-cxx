@@ -13,21 +13,21 @@ using std::max;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// Linear sequence with access at "bottom" and "top"
-    /// projected onto a memory segment.
+    /// Deck projected onto a memory segment.
     ///
-    /// Actual elements are stored in "words" [0,count).
-    /// The first "word" stores the "bottom" element.
-    /// The last "word" stores the "top" element.
+    /// Elements are stored bottom at left, top at right.
     export
     template <typename T>
     class segment_deck
     {
-        segment<T> root_;
+        segment<T> segment_;
+
+        size_t     first_;
+
         size_t     count_;
 
-        explicit segment_deck (segment<T> r, size_t c) noexcept :
-            root_{r},count_{c}
+        explicit segment_deck (segment<T> segment, size_t first, size_t count) noexcept :
+            segment_ { segment }, first_ { first }, count_ { count }
         { }
 
     public:
@@ -38,24 +38,25 @@ namespace br::dev::pedrolamarao::structures
 
         /// Constructs an empty deck.
         segment_deck () noexcept :
-            segment_deck({},0)
+            segment_deck({},{},{})
         { }
 
         /// Moves that deck into this deck.
         segment_deck (segment_deck && that) noexcept :
-            root_{that.root_}, count_{that.count_}
+            segment_ { that.segment_ }, first_ { that.first_ }, count_ { that.count_ }
         {
-            that.root_ = {};
+            that.segment_ = {};
+            that.first_ = {};
             that.count_ = {};
         }
 
         /// Moves that deck into this deck.
         auto operator= (segment_deck && that) noexcept -> segment_deck&
         {
-            root_ = that.root_;
-            count_ = that.count_;
-            that.root_ = {};
-            that.count_ = {};
+            using std::swap;
+            swap(segment_,that.segment_);
+            swap(first_,that.first_);
+            swap(count_,that.count_);
             return *this;
         }
 
@@ -66,7 +67,7 @@ namespace br::dev::pedrolamarao::structures
         /// Destructs this deck.
         ~segment_deck ()
         {
-            delete [] root_.base;
+            delete [] segment_.base;
         }
 
         // query
@@ -76,7 +77,7 @@ namespace br::dev::pedrolamarao::structures
         /// Requires: not_empty
         auto bottom () -> value_type
         {
-            return root_.base[0];
+            return segment_.base[ first_ ];
         }
 
         auto is_empty () const
@@ -94,7 +95,7 @@ namespace br::dev::pedrolamarao::structures
         /// Requires: not_empty
         auto top () -> value_type
         {
-            return root_.base[ count_ - 1 ];
+            return segment_.base[ count_ - first_ - 1 ];
         }
 
         // update
@@ -104,7 +105,7 @@ namespace br::dev::pedrolamarao::structures
         /// Requires: not_empty
         void erase_bottom ()
         {
-            shift_left(root_,0,count_);
+            ++first_;
             --count_;
         }
 
@@ -119,35 +120,45 @@ namespace br::dev::pedrolamarao::structures
         /// Inserts into the bottom.
         void insert_bottom (T value) requires copyable<T>
         {
-            auto new_count = count_ + 1;
-            expand(new_count);
-            shift_right(root_,0,count_);
-            root_.base[0] = value;
-            count_ = new_count;
+            if (first_ > 0)
+                --first_;
+            else
+                expand_right(0);
+            segment_.base[first_] = value;
+            ++count_;
         }
 
         /// Inserts into the top.
         void insert_top (T value) requires copyable<T>
         {
-            auto new_count = count_ + 1;
-            expand(new_count);
-            root_.base[count_] = value;
-            count_ = new_count;
+            if (count_ == segment_.length - first_)
+                expand_right(count_);
+            segment_.base[count_] = value;
+            ++count_;
         }
 
     private:
 
-        // provides: [0,capacity) is initialized
-        void expand (size_t capacity) requires default_initializable<T> && copyable<T>
+        // provides: capacity is approximately doubled
+        // provides: every cell is initialized
+        void expand_right (size_t index)
         {
-            if (capacity <= root_.length)
-                return;
-            auto new_base = new T[capacity];
-            for (auto i = 0; i != count_; ++i)
-                new_base[i] = root_.base[i];
-            delete [] root_.base;
-            root_.base = new_base;
-            root_.length = capacity;
+            auto floor = segment_.length / 2;
+            auto length = (floor + 1) * 2;
+            auto base = new T[ length ];
+            for (auto i = 0; i < index; ++i)
+                base[i] = segment_.base[i];
+            for (auto i = index; i != count_; ++i)
+                base[i+1] = segment_.base[i];
+            delete [] segment_.base;
+            segment_.base = base;
+            segment_.length = length;
+        }
+
+        // requires: index <= count_
+        void shift_right (size_t index)
+        {
+            structures::shift_right(segment_,first_ + index,count_);
         }
     };
 }
