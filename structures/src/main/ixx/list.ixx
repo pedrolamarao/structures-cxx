@@ -22,6 +22,8 @@ namespace br::dev::pedrolamarao::structures
     {
         requires default_initializable<Structure>;
 
+        requires movable<Structure>;
+
         typename Structure::value_type;
 
         requires default_initializable< typename Structure::value_type >;

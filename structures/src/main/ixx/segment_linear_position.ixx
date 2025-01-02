@@ -7,13 +7,10 @@ namespace br::dev::pedrolamarao::structures
     template <typename T>
     class segment_linear_position
     {
-        template <typename>
-        friend class segment_list;
-
-        T* position_;
+        T* address_;
 
         explicit segment_linear_position (T* position) :
-            position_ { position }
+            address_ { position }
         { }
 
     public:
@@ -22,24 +19,24 @@ namespace br::dev::pedrolamarao::structures
 
         auto is_equal (segment_linear_position that)
         {
-            return position_ == that.position_;
+            return address_ == that.address_;
         }
 
         auto not_equal (segment_linear_position that)
         {
-            return position_ != that.position_;
+            return address_ != that.address_;
         }
 
         // ---
 
         auto load ()
         {
-            return *position_;
+            return *address_;
         }
 
         auto& store ()
         {
-            return *position_;
+            return *address_;
         }
 
         // ---
@@ -47,14 +44,20 @@ namespace br::dev::pedrolamarao::structures
         // requires: ?
         auto next ()
         {
-            return segment_linear_position(position_+1);
+            return segment_linear_position(address_+1);
         }
 
         // requires: ?
         auto previous ()
         {
-            return segment_linear_position(position_-1);
+            return segment_linear_position(address_-1);
         }
+
+        template <typename>
+        friend class segment_list_v1;
+
+        template <typename>
+        friend class segment_list_v2;
     };
 
     export

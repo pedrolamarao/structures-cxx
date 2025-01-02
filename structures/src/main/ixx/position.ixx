@@ -19,6 +19,8 @@ namespace br::dev::pedrolamarao::structures
     template <typename Position>
     concept position = requires (Position position)
     {
+        requires copyable<Position>;
+
         { is_equal(position,position) } -> convertible_to<bool>;
 
         { not_equal(position,position) } -> convertible_to<bool>;

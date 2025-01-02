@@ -7,9 +7,6 @@ namespace br::dev::pedrolamarao::structures
     template <typename T>
     class segment_circular_position
     {
-        template <typename>
-        friend class segment_list;
-
         T* base_;
 
         T* position_;

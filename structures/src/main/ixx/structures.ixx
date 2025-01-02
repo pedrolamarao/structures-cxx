@@ -20,7 +20,8 @@ export import :binode_queue;
 
 export import :segment;
 export import :segment_deck;
-export import :segment_list;
+export import :segment_list_v1;
+export import :segment_list_v2;
 export import :segment_list_position;
 export import :segment_stack;
 
