@@ -6,6 +6,7 @@ export module br.dev.pedrolamarao.structures:segment;
 
 using std::copyable;
 using std::movable;
+using std::size_t;
 
 namespace br::dev::pedrolamarao::structures
 {

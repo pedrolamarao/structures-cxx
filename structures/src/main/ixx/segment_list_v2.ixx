@@ -11,6 +11,7 @@ import :segment_list_position;
 using std::copyable;
 using std::default_initializable;
 using std::max;
+using std::size_t;
 
 namespace br::dev::pedrolamarao::structures
 {
