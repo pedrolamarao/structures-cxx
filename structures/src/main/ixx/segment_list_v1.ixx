@@ -98,11 +98,6 @@ namespace br::dev::pedrolamarao::structures
 
         // properties
 
-        auto capacity_right () const
-        {
-            return segment_.length - count_;
-        }
-
         auto is_empty () const
         {
             return count_ == 0;
@@ -162,10 +157,12 @@ namespace br::dev::pedrolamarao::structures
 
         auto insert_at (size_t index, T value) requires copyable<T>
         {
-            if (count_ == segment_.length) // space not available
-                expand(count_ + 1);
-            if (index != count_) // index not at right
-                shift_right(segment_,index,count_);
+            // has space?
+            if (count_ == segment_.length)
+                expand();
+            // index left or middle?
+            if (index != count_)
+                shift_right(index);
             segment_.base[index] = value;
             ++count_;
             return segment_linear_position<T>(segment_.base + index);
@@ -174,7 +171,7 @@ namespace br::dev::pedrolamarao::structures
         void remove_first ()
         // requires not_empty()
         {
-            shift_left(segment_,0,count_);
+            shift_left(0);
             --count_;
         }
 
@@ -193,21 +190,34 @@ namespace br::dev::pedrolamarao::structures
 
         void remove_at (size_t index)
         {
-            shift_left(segment_,index,count_);
+            shift_left(index);
             --count_;
         }
 
     private:
 
-        // provides: [0,length) is initialized
-        void expand (size_t length) requires default_initializable<T> && copyable<T>
+        // provides: capacity is approximately doubled
+        // provides: every cell is default initialized
+        void expand ()
         {
-            auto new_base = new T[length];
+            auto floor = segment_.length / 2;
+            auto length = (floor + 1) * 2;
+            auto base = new T[ length ];
             for (auto i = 0; i != count_; ++i)
-                new_base[i] = segment_.base[i];
+                base[i] = segment_.base[i];
             delete [] segment_.base;
-            segment_.base = new_base;
+            segment_.base = base;
             segment_.length = length;
+        }
+
+        void shift_left (size_t index)
+        {
+            structures::shift_left(segment_, index,count_);
+        }
+
+        void shift_right (size_t index)
+        {
+            structures::shift_right(segment_,index,count_);
         }
     };
 }

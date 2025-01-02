@@ -105,16 +105,6 @@ namespace br::dev::pedrolamarao::structures
 
         // properties
 
-        auto capacity_left () const
-        {
-            return first_;
-        }
-
-        auto capacity_right () const
-        {
-            return segment_.length + first_ - count_;
-        }
-
         auto is_empty () const
         {
             return count_ == 0;
@@ -176,50 +166,50 @@ namespace br::dev::pedrolamarao::structures
         requires copyable<T>
         // requires index < count_
         {
-            // insert at left
+            // insert at left?
             if (index == 0)
             {
-                // has capacity
+                // has space at left?
                 if (first_ > 0)
                 {
                     --first_;
                 }
-                // does not have capacity
+                // does not have space at left
                 else
                 {
-                    expand(count_ + 1);
-                    shift_right(segment_,first_ + index,count_);
+                    expand();
+                    shift_right(index);
                 }
             }
-            // insert at right
+            // insert at right?
             else if (index == count_)
             {
-                // has capacity
-                if (count_ < segment_.length)
+                // has space at right?
+                if (count_ < segment_.length - first_)
                 {
                 }
-                // does not have capacity
+                // does not have space at left
                 else
                 {
-                    expand(count_ + 1);
+                    expand();
                 }
             }
             // insert at middle
             else
             {
-                // has capacity
-                if (count_ < segment_.length)
+                // has space at right?
+                if (count_ < segment_.length - first_)
                 {
-                    shift_right(segment_,first_ + index,count_);
+                    shift_right(index);
                 }
-                // does not have capacity
+                // does not have space at left
                 else
                 {
-                    expand(count_ + 1);
-                    shift_right(segment_,first_ + index,count_);
+                    expand();
+                    shift_right(index);
                 }
             }
-            // finish
+            // store
             segment_.base[ first_ + index ] = value;
             ++count_;
             return segment_linear_position<T>(segment_.base + first_ + index);
@@ -250,21 +240,34 @@ namespace br::dev::pedrolamarao::structures
             if (index == 0)
                 ++first_;
             else
-                shift_left(segment_,first_ + index,count_);
+                shift_left(index);
             --count_;
         }
 
     private:
 
-        // provides: [0,length) is initialized
-        void expand (size_t length) requires default_initializable<T> && copyable<T>
+        // provides: capacity is approximately doubled
+        // provides: every cell is default initialized
+        void expand ()
         {
-            auto new_base = new T[length];
+            auto floor = segment_.length / 2;
+            auto length = (floor + 1) * 2;
+            auto base = new T[ length ];
             for (auto i = 0; i != count_; ++i)
-                new_base[i] = segment_.base[i];
+                base[i] = segment_.base[i];
             delete [] segment_.base;
-            segment_.base = new_base;
+            segment_.base = base;
             segment_.length = length;
+        }
+
+        void shift_left (size_t index)
+        {
+            structures::shift_left(segment_,first_ + index,count_);
+        }
+
+        void shift_right (size_t index)
+        {
+            structures::shift_right(segment_,first_ + index,count_);
         }
     };
 }
