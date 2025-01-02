@@ -24,7 +24,9 @@ using types = testing::Types<
     binode_list_v1<thing>,
     binode_list_v2<thing>,
     binode_list_v3<thing>,
-    segment_list<thing>,
+    segment_list_v1<thing>,
+    segment_list_v2<thing>,
+    segment_list_v3<thing>,
     uninode_list_v1<thing>,
     uninode_list_v2<thing>,
     uninode_list_v3<thing>
@@ -32,11 +34,94 @@ using types = testing::Types<
 
 TYPED_TEST_SUITE(list_test,types);
 
+TYPED_TEST(list_test,defaultt)
+{
+    TypeParam empty;
+    ASSERT_TRUE( empty.is_empty() );
+    ASSERT_EQ( empty.first(), empty.after_last() );
+    ASSERT_EQ( 0, distance(empty.first(),empty.after_last()) );
+}
+
+TYPED_TEST(list_test,filled)
+{
+    auto empty = TypeParam::filled(thing::zero,0);
+    ASSERT_TRUE( empty.is_empty() );
+    ASSERT_EQ( empty.first(), empty.after_last() );
+    ASSERT_EQ( 0, distance(empty.first(),empty.after_last()) );
+
+    auto one = TypeParam::filled(thing::one,1);
+    ASSERT_TRUE( one.not_empty() );
+    ASSERT_NE( one.first(), one.after_last() );
+    ASSERT_EQ( 1, distance(one.first(),one.after_last()) );
+
+    auto filled = TypeParam::filled(thing::forty_nine,49);
+    ASSERT_TRUE( filled.not_empty() );
+    ASSERT_EQ( 49, distance(filled.first(),filled.after_last()) );
+}
+
+TYPED_TEST(list_test,default_insert_first)
+{
+    TypeParam list;
+
+    list.insert_first(thing::one);
+    ASSERT_TRUE(list.not_empty());
+    ASSERT_NE(list.first(),list.after_last());
+    ASSERT_EQ(load(list.first()),thing::one);
+
+    list.insert_first(thing::two);
+    ASSERT_TRUE(list.not_empty());
+    ASSERT_NE(list.first(),list.after_last());
+    ASSERT_EQ(load(list.first()),thing::two);
+
+    list.insert_first(thing::forty_nine);
+    ASSERT_TRUE(list.not_empty());
+    ASSERT_NE(list.first(),list.after_last());
+    ASSERT_EQ(load(list.first()),thing::forty_nine);
+}
+
+TYPED_TEST(list_test,filled_insert_first)
+{
+    auto list = TypeParam::filled(thing::one,3);
+
+    list.insert_first(thing::forty_nine);
+    ASSERT_TRUE(list.not_empty());
+    ASSERT_NE(list.first(),list.after_last());
+    ASSERT_EQ(load(list.first()),thing::forty_nine);
+}
+
+TYPED_TEST(list_test,filled_remove_first)
+{
+    auto list = TypeParam::filled(thing::one,3);
+
+    list.remove_first();
+    ASSERT_TRUE(list.not_empty());
+    ASSERT_NE(list.first(),list.after_last());
+    ASSERT_EQ(load(list.first()),thing::one);
+
+    list.remove_first();
+    ASSERT_TRUE(list.not_empty());
+    ASSERT_NE(list.first(),list.after_last());
+    ASSERT_EQ(load(list.first()),thing::one);
+
+    list.remove_first();
+    ASSERT_TRUE(list.is_empty());
+    ASSERT_EQ(list.first(),list.after_last());
+}
+
+TYPED_TEST(list_test,filled_remove_insert_first)
+{
+    auto list = TypeParam::filled(thing::one,3);
+
+    list.remove_first();
+    list.insert_first(thing::forty_nine);
+    ASSERT_TRUE(list.not_empty());
+    ASSERT_NE(list.first(),list.after_last());
+    ASSERT_EQ(load(list.first()),thing::forty_nine);
+}
+
 TYPED_TEST(list_test,default_insert_remove_first)
 {
     TypeParam list;
-    ASSERT_TRUE(list.is_empty());
-    ASSERT_EQ(list.first(),list.after_last());
 
     list.insert_first(thing::one);
     ASSERT_TRUE(list.not_empty());
@@ -59,7 +144,7 @@ TYPED_TEST(list_test,default_insert_remove_first)
     ASSERT_EQ(load(list.first()),thing::two);
 
     list.remove_first();
-    ASSERT_TRUE(list.not_empty() );
+    ASSERT_TRUE(list.not_empty());
     ASSERT_NE(list.first(),list.after_last());
     ASSERT_EQ(load(list.first()),thing::one);
 

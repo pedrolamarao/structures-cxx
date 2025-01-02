@@ -4,27 +4,27 @@ import :binode;
 
 namespace br::dev::pedrolamarao::structures
 {
-    /// Position on bi-link node lists.
+    /// Linear position on a bi-linked memory chain.
     export
     template <typename T>
-    class binode_list_position
+    class binode_linear_position
     {
-        binode<T> * node;
+        binode<T>* node;
 
-        explicit binode_list_position (binode<T> * p) : node{p} {}
+        explicit binode_linear_position (binode<T> * p) : node{p} {}
 
     public:
 
         using value_type = T;
 
-        binode_list_position () = delete;
+        binode_linear_position () = delete;
 
-        auto is_equal (binode_list_position that)
+        auto is_equal (binode_linear_position that)
         {
             return node == that.node;
         }
 
-        auto not_equal (binode_list_position that)
+        auto not_equal (binode_linear_position that)
         {
             return node != that.node;
         }
@@ -41,14 +41,17 @@ namespace br::dev::pedrolamarao::structures
         // requires: current != nullptr
         auto next ()
         {
-            return binode_list_position(node->right);
+            return binode_linear_position(node->right);
         }
 
         // requires: current != nullptr
         auto previous ()
         {
-            return binode_list_position(node->left);
+            return binode_linear_position(node->left);
         }
+
+        template <typename>
+        friend class binode_hoop_v1;
 
         template <typename>
         friend class binode_list_v1;
@@ -62,35 +65,35 @@ namespace br::dev::pedrolamarao::structures
 
     export
     template <typename T>
-    auto is_equal (binode_list_position<T> x, binode_list_position<T> y)
+    auto is_equal (binode_linear_position<T> x, binode_linear_position<T> y)
     {
         return x.is_equal(y);
     }
 
     export
     template <typename T>
-    auto not_equal (binode_list_position<T> x, binode_list_position<T> y)
+    auto not_equal (binode_linear_position<T> x, binode_linear_position<T> y)
     {
         return x.not_equal(y);
     }
 
     export
     template <typename T>
-    auto load (binode_list_position<T> x)
+    auto load (binode_linear_position<T> x)
     {
         return x.load();
     }
 
     export
     template <typename T>
-    auto next (binode_list_position<T> x)
+    auto next (binode_linear_position<T> x)
     {
         return x.next();
     }
 
     export
     template <typename T>
-    auto previous (binode_list_position<T> x)
+    auto previous (binode_linear_position<T> x)
     {
         return x.previous();
     }

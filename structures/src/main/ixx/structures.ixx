@@ -11,6 +11,7 @@ export import :stack;
 
 export import :binode;
 export import :binode_deck;
+export import :binode_hoop_v1;
 export import :binode_list_v1;
 export import :binode_list_v2;
 export import :binode_list_v3;
@@ -19,12 +20,13 @@ export import :binode_queue;
 
 export import :segment;
 export import :segment_deck;
-export import :segment_list;
+export import :segment_list_v1;
+export import :segment_list_v2;
+export import :segment_list_v3;
 export import :segment_list_position;
 export import :segment_stack;
 
 export import :uninode;
-export import :uninode_hoop;
 export import :uninode_list_v1;
 export import :uninode_list_v2;
 export import :uninode_list_v3;

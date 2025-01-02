@@ -42,7 +42,7 @@ namespace br::dev::pedrolamarao::structures
 
         using value_type = T;
 
-        using position_type = binode_list_position<T>;
+        using position_type = binode_linear_position<T>;
 
         // type
 
@@ -94,9 +94,9 @@ namespace br::dev::pedrolamarao::structures
             if (count == 0)
                 return binode_list_v2<TT>();
             auto first = new binode<TT>;
-            first->value = value;
+            first->content = value;
             auto current = first;
-            while (count > 0) {
+            while (count > 1) {
                 auto next = new binode<TT>;
                 next->content = value;
                 next->left = current;
@@ -104,6 +104,7 @@ namespace br::dev::pedrolamarao::structures
                 current = next;
                 --count;
             }
+            current->right = nullptr;
             return binode_list_v2<TT>(first,current);
         }
 
@@ -124,25 +125,25 @@ namespace br::dev::pedrolamarao::structures
         /// Position before the first element.
         auto before_first ()
         {
-            return binode_list_position<T>(&head_);
+            return binode_linear_position<T>(&head_);
         }
 
         /// Position of the first element.
         auto first ()
         {
-            return binode_list_position<T>(head_.right);
+            return binode_linear_position<T>(head_.right);
         }
 
         /// Position of the last element.
         auto last ()
         {
-            return binode_list_position<T>(head_.left);
+            return binode_linear_position<T>(head_.left);
         }
 
         /// Position after the last element.
         auto after_last ()
         {
-            return binode_list_position<T>(nullptr);
+            return binode_linear_position<T>(nullptr);
         }
 
         // update
@@ -152,10 +153,10 @@ namespace br::dev::pedrolamarao::structures
         {
             auto inserted = new binode<T>(&head_,head_.right,value);
             head_.right = inserted;
-            return binode_list_position<T>(inserted);
+            return binode_linear_position<T>(inserted);
         }
 
-        auto insert_after (binode_list_position<T> position, T value)
+        auto insert_after (binode_linear_position<T> position, T value)
         requires copyable<T>
         // requires is_reachable(first(),position)
         {
@@ -164,7 +165,7 @@ namespace br::dev::pedrolamarao::structures
             auto inserted = new binode<T>(previous,next,value);
             previous->right = inserted;
             if (next != nullptr) next->left = inserted;
-            return binode_list_position<T>(inserted);
+            return binode_linear_position<T>(inserted);
         }
 
         auto remove_first ()
