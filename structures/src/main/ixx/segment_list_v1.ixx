@@ -18,15 +18,15 @@ namespace br::dev::pedrolamarao::structures
     ///
     /// List positions are memory "words".
     ///
-    /// Unused storage is kept aligned to the right,
-    /// compacting whenever erasing or inserting at left or middle.
+    /// Unused storage is maintained at right.
+    /// Compacting shifts towards left.
     ///
     /// Advantages of this implementation:
     /// - minimal list object
-    /// - minimal insert_after and erase_after
+    /// - minimal insert_after and remove_after
     ///
     /// Disadvantages of this implementation:
-    /// - insert_first and erase_first always shifts elements
+    /// - insert and remove at left must make space
     export
     template <typename T>
     class segment_list_v1
@@ -138,7 +138,7 @@ namespace br::dev::pedrolamarao::structures
 
         auto insert_first (value_type value)
         {
-            return insert_at(first(),value);
+            return insert_at(0,value);
         }
 
         auto insert_after (position_type position, T value)
@@ -155,14 +155,15 @@ namespace br::dev::pedrolamarao::structures
             return insert_at(index,value);
         }
 
+        // requires index <= count_
         auto insert_at (size_t index, T value) requires copyable<T>
         {
             // has space?
-            if (count_ == segment_.length)
-                expand();
-            // index left or middle?
-            if (index != count_)
+            if (count_ != segment_.length)
                 shift_right(index);
+            else
+                expand_right(index);
+            // store
             segment_.base[index] = value;
             ++count_;
             return segment_linear_position<T>(segment_.base + index);
@@ -182,12 +183,13 @@ namespace br::dev::pedrolamarao::structures
         }
 
         void remove_at (position_type position)
-        // is_reachable(first(),position)
+        // requires is_reachable(first(),position)
         {
             size_t index = position.address_ - segment_.base;
             remove_at(index);
         }
 
+        // requires index < count_
         void remove_at (size_t index)
         {
             shift_left(index);
@@ -196,25 +198,30 @@ namespace br::dev::pedrolamarao::structures
 
     private:
 
+        // requires: index <= count_
         // provides: capacity is approximately doubled
-        // provides: every cell is default initialized
-        void expand ()
+        // provides: every cell is initialized
+        void expand_right (size_t index)
         {
             auto floor = segment_.length / 2;
             auto length = (floor + 1) * 2;
             auto base = new T[ length ];
-            for (auto i = 0; i != count_; ++i)
+            for (auto i = 0; i < index; ++i)
                 base[i] = segment_.base[i];
+            for (auto i = index; i != count_; ++i)
+                base[i+1] = segment_.base[i];
             delete [] segment_.base;
             segment_.base = base;
             segment_.length = length;
         }
 
+        // requires: index <= count_
         void shift_left (size_t index)
         {
-            structures::shift_left(segment_, index,count_);
+            structures::shift_left(segment_,index,count_);
         }
 
+        // requires: index <= count_
         void shift_right (size_t index)
         {
             structures::shift_right(segment_,index,count_);

@@ -18,18 +18,15 @@ namespace br::dev::pedrolamarao::structures
     ///
     /// List positions are memory "words".
     ///
-    /// Unused storage is preferred aligned to the right,
-    /// compacting whenever erasing at middle.
-    ///
-    /// Unused storage is allowed at the left,
-    /// not compacting when erasing at left.
+    /// Unused storage is maintained at left and right.
+    /// Compacting shifts towards left.
     ///
     /// Advantages of this implementation:
-    /// - insert_first and erase_first may reuse capacity
+    /// - insert and remove at left may reuse space
     ///
     /// Disadvantages of this implementation:
     /// - list object requires additional storage
-    /// - insert_after and erase_after require testing if at left
+    /// - insert_after and remove_after requires two levels of branching
     export
     template <typename T>
     class segment_list_v2
@@ -174,11 +171,10 @@ namespace br::dev::pedrolamarao::structures
                 {
                     --first_;
                 }
-                // does not have space at left
+                // no space
                 else
                 {
-                    expand();
-                    shift_right(index);
+                    expand_right(index);
                 }
             }
             // insert at right?
@@ -188,10 +184,10 @@ namespace br::dev::pedrolamarao::structures
                 if (count_ < segment_.length - first_)
                 {
                 }
-                // does not have space at left
+                // no space
                 else
                 {
-                    expand();
+                    expand_right(index);
                 }
             }
             // insert at middle
@@ -202,11 +198,10 @@ namespace br::dev::pedrolamarao::structures
                 {
                     shift_right(index);
                 }
-                // does not have space at left
+                // no space
                 else
                 {
-                    expand();
-                    shift_right(index);
+                    expand_right(index);
                 }
             }
             // store
@@ -237,8 +232,10 @@ namespace br::dev::pedrolamarao::structures
         void remove_at (size_t index)
         // requires index < count_
         {
+            // erase at left?
             if (index == 0)
                 ++first_;
+            // erase at middle or right
             else
                 shift_left(index);
             --count_;
@@ -246,25 +243,30 @@ namespace br::dev::pedrolamarao::structures
 
     private:
 
+        // requires: index <= count_
         // provides: capacity is approximately doubled
-        // provides: every cell is default initialized
-        void expand ()
+        // provides: every cell is initialized
+        void expand_right (size_t index)
         {
             auto floor = segment_.length / 2;
             auto length = (floor + 1) * 2;
             auto base = new T[ length ];
-            for (auto i = 0; i != count_; ++i)
+            for (auto i = 0; i < index; ++i)
                 base[i] = segment_.base[i];
+            for (auto i = index; i != count_; ++i)
+                base[i+1] = segment_.base[i];
             delete [] segment_.base;
             segment_.base = base;
             segment_.length = length;
         }
 
+        // requires: index <= count_
         void shift_left (size_t index)
         {
             structures::shift_left(segment_,first_ + index,count_);
         }
 
+        // requires: index <= count_
         void shift_right (size_t index)
         {
             structures::shift_right(segment_,first_ + index,count_);
