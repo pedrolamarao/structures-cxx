@@ -94,12 +94,14 @@ namespace br::dev::pedrolamarao::structures
             auto first = new uninode<T>;
             first->content = value;
             auto current = first;
-            while (--count > 0) {
+            while (count > 1) {
                 auto next = new uninode<TT>;
                 next->content = value;
                 current->link = next;
                 current = next;
+                --count;
             }
+            current->link = nullptr;
             return uninode_list_v2<TT>(first);
         }
 

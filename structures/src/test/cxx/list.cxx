@@ -32,6 +32,31 @@ using types = testing::Types<
 
 TYPED_TEST_SUITE(list_test,types);
 
+TYPED_TEST(list_test,defaultt)
+{
+    TypeParam empty;
+    ASSERT_TRUE( empty.is_empty() );
+    ASSERT_EQ( empty.first(), empty.after_last() );
+    ASSERT_EQ( 0, distance(empty.first(),empty.after_last()) );
+}
+
+TYPED_TEST(list_test,filled)
+{
+    auto empty = TypeParam::filled(thing::zero,0);
+    ASSERT_TRUE( empty.is_empty() );
+    ASSERT_EQ( empty.first(), empty.after_last() );
+    ASSERT_EQ( 0, distance(empty.first(),empty.after_last()) );
+
+    auto one = TypeParam::filled(thing::one,1);
+    ASSERT_TRUE( one.not_empty() );
+    ASSERT_NE( one.first(), one.after_last() );
+    ASSERT_EQ( 1, distance(one.first(),one.after_last()) );
+
+    auto filled = TypeParam::filled(thing::forty_nine,49);
+    ASSERT_TRUE( filled.not_empty() );
+    ASSERT_EQ( 49, distance(filled.first(),filled.after_last()) );
+}
+
 TYPED_TEST(list_test,default_insert_remove_first)
 {
     TypeParam list;

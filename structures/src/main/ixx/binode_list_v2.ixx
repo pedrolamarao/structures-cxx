@@ -96,7 +96,7 @@ namespace br::dev::pedrolamarao::structures
             auto first = new binode<TT>;
             first->content = value;
             auto current = first;
-            while (count > 0) {
+            while (count > 1) {
                 auto next = new binode<TT>;
                 next->content = value;
                 next->left = current;
@@ -104,6 +104,7 @@ namespace br::dev::pedrolamarao::structures
                 current = next;
                 --count;
             }
+            current->right = nullptr;
             return binode_list_v2<TT>(first,current);
         }
 
