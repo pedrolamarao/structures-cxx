@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.30)
 
 set(CMAKE_CXX_STANDARD 20)
 
-find_package(Celero REQUIRED)
 find_package(GTest REQUIRED)
+find_package(nanobench REQUIRED)
 
 add_library(structures)
 
@@ -29,7 +29,7 @@ target_sources(structures-test
         ${test_cxx_sources}
 )
 
-target_link_libraries(structures-test structures GTest::gmock)
+target_link_libraries(structures-test GTest::gmock structures)
 
 add_executable(structures-measure)
 
@@ -43,4 +43,4 @@ target_sources(structures-measure
         ${measure_cxx_sources}
 )
 
-target_link_libraries(structures-measure structures celero)
+target_link_libraries(structures-measure structures nanobench::nanobench)

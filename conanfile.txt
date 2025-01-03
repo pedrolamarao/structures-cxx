@@ -1,6 +1,6 @@
 [requires]
-celero/2.9.0
 gtest/1.15.0
+nanobench/4.3.11
 
 [layout]
 cmake_layout
