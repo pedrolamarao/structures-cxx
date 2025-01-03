@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.30)
 
 set(CMAKE_CXX_STANDARD 20)
 
+find_package(Celero REQUIRED)
 find_package(GTest REQUIRED)
 
 add_library(structures)
@@ -29,3 +30,17 @@ target_sources(structures-test
 )
 
 target_link_libraries(structures-test structures GTest::gmock)
+
+add_executable(structures-measure)
+
+file(GLOB_RECURSE measure_cxx_sources CONFIGURE_DEPENDS "src/measure/cxx/*")
+file(GLOB_RECURSE measure_ixx_sources CONFIGURE_DEPENDS "src/measure/ixx/*")
+
+target_sources(structures-measure
+        PRIVATE FILE_SET modules TYPE CXX_MODULES FILES
+        ${measure_ixx_sources}
+        PRIVATE
+        ${measure_cxx_sources}
+)
+
+target_link_libraries(structures-measure structures celero)
