@@ -9,8 +9,8 @@ namespace br::dev::pedrolamarao::structures
     {
         T* address_;
 
-        explicit segment_linear_position (T* position) :
-            address_ { position }
+        explicit segment_linear_position (T* address) :
+            address_ { address }
         { }
 
     public:

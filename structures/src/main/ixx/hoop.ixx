@@ -16,6 +16,9 @@ namespace br::dev::pedrolamarao::structures
     ///
     /// Circular structures' parts are like points in a circle,
     /// each position having a single predecessor and a single successor.
+    ///
+    /// In a circular structure, every position is reachable from its successor,
+    /// or, <code>is_reachable(next(p),p)</code> terminates for all positions in the structure.
     export
     template <typename Structure>
     concept hoop = requires (Structure structure)
@@ -41,15 +44,19 @@ namespace br::dev::pedrolamarao::structures
 
         // positions
 
-        { structure.start() } -> same_as< typename Structure::position_type >;
+        { structure.first() } -> same_as< typename Structure::position_type >;
 
         // operations
 
         requires requires (typename Structure::position_type position, typename Structure::value_type value)
         {
-            { structure.insert_start(value) } -> same_as< typename Structure::position_type >;
+            { structure.insert_first(value) } -> same_as< typename Structure::position_type >;
 
-            { structure.remove_start() };
+            { structure.insert_after(position,value) } -> same_as< typename Structure::position_type >;
+
+            { structure.remove_first() };
+
+            { structure.remove_after(position) };
         };
     };
 }

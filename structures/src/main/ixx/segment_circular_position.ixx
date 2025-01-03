@@ -7,14 +7,14 @@ namespace br::dev::pedrolamarao::structures
     template <typename T>
     class segment_circular_position
     {
-        T* base_;
+        T* base;
 
-        T* position_;
+        T* address;
 
-        T* limit_;
+        T* limit;
 
         explicit segment_circular_position (T* base, T* position, T* limit) :
-            base_ { base }, position_ { position }, limit_ { limit }
+            base { base }, address { position }, limit { limit }
         { }
 
     public:
@@ -23,24 +23,24 @@ namespace br::dev::pedrolamarao::structures
 
         auto is_equal (segment_circular_position that)
         {
-            return position_ == that.position_;
+            return address == that.address;
         }
 
         auto not_equal (segment_circular_position that)
         {
-            return position_ != that.position_;
+            return address != that.address;
         }
 
         // ---
 
         auto load ()
         {
-            return *position_;
+            return *address;
         }
 
         auto& store ()
         {
-            return *position_;
+            return *address;
         }
 
         // ---
@@ -48,17 +48,20 @@ namespace br::dev::pedrolamarao::structures
         // requires: ?
         auto next ()
         {
-            auto p = position_ + 1;
-            if (p == limit_) p = base_;
-            return segment_circular_position(base_,p,limit_);
+            auto next = address + 1;
+            if (next == limit) next = base;
+            return segment_circular_position(base,next,limit);
         }
 
         // requires: ?
         auto previous ()
         {
-            auto p = position_ == base_ ? position_ : limit_;
-            return segment_circular_position(p - 1);
+            auto current = address == base ? limit : address;
+            return segment_circular_position(base,current - 1,limit);
         }
+
+        template <typename>
+        friend class segment_hoop_v1;
     };
 
     export
